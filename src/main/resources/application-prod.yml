@@ -1,0 +1,10 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://47.94.144.190:3306/oracleclub?serverTimezone=GMT&characterEncoding=utf8
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource

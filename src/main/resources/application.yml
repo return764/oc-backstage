@@ -1,0 +1,35 @@
+server:
+  port: 8081
+
+spring:
+  profiles:
+    active: dev
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 300MB
+
+  mail:
+    username: 18398858464@163.com
+    password: ZTUDFDOLCYGOFZJF
+    host: smtp.163.com
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/oracleclub?serverTimezone=GMT&characterEncoding=utf8
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+
+
