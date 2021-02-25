@@ -10,6 +10,7 @@ import lombok.Data;
  */
 @Data
 public class PictureParam implements InputConverter<Picture> {
+
     private String name;
     private String description;
     private Long size;

@@ -88,15 +88,13 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
 
     @Override
     public ArticleDetailVO createBy(Article article) {
-        ArticleDetailVO articleDetailVO = createOrUpdateBy(article);
-        return articleDetailVO;
+        return createOrUpdateBy(article);
     }
 
     @Override
     public ArticleDetailVO updateBy(Article article) {
         article.setUpdatedAt(new Date());
-        ArticleDetailVO articleDetailVO = createOrUpdateBy(article);
-        return articleDetailVO;
+        return createOrUpdateBy(article);
     }
 
     @Override
@@ -135,34 +133,29 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
     }
 
     @Override
-    public ArticleDetailVO convertToDetailVo(Article article) {
+    public ArticleDetailVO convertToVO(Article article) {
         return convertTo(article);
     }
 
     @Override
-    public List<ArticleDetailVO> convertToListVo(List<Article> articles) {
+    public List<ArticleDetailVO> convertToListVO(List<Article> articles) {
         return articles.stream().map(this::convertTo).collect(Collectors.toList());
     }
 
     @Override
-    public Page<ArticleDetailVO> convertToDetailVo(Page<Article> articles){
-        return articles.map(this::convertToDetailVo);
+    public Page<ArticleDetailVO> convertToPageVO(Page<Article> articles){
+        return articles.map(this::convertToVO);
     }
 
     private ArticleDetailVO convertTo(Article article){
         Assert.notNull(article,"Article must not be null");
 
-        ArticleDetailVO articleDetailVO = new ArticleDetailVO().convertFrom(article);
-
-        return articleDetailVO;
+        return new ArticleDetailVO().convertFrom(article);
     }
 
     @Override
     public ArticleDetailVO createOrUpdateBy(Article article) {
-        if(ServiceUtils.isEmptyId(article.getId())){
-            return convertToDetailVo(create(article));
-        }
-        return convertToDetailVo(update(article));
+        return convertToVO(createOrUpdate(article));
     }
 
     @Override
@@ -199,5 +192,14 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
     @Override
     public void increaseLike(Long articleId) {
         increaseLike(1,articleId);
+    }
+
+    @Override
+    public Article removeSoftById(Long id) {
+        Article article = getById(id);
+        article.setStatus(ArticleStatus.DELETED);
+        article.setDeletedAt(new Date());
+
+        return update(article);
     }
 }

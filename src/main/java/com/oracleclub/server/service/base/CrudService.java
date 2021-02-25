@@ -57,7 +57,15 @@ public interface CrudService<DOMAIN,ID> {
 
     @Transactional
     @NonNull
+    DOMAIN createOrUpdate(@NonNull DOMAIN domain);
+
+    @Transactional
+    @NonNull
     DOMAIN removeById(@NonNull ID id);
+
+    @Transactional
+    @NonNull
+    DOMAIN removeSoftById(@NonNull ID id);
 
     @Transactional
     @Nullable

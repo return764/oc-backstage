@@ -1,6 +1,8 @@
 package com.oracleclub.server.service.base;
 
 import com.oracleclub.server.dao.base.BaseDao;
+import com.oracleclub.server.entity.base.BaseEntity;
+import com.oracleclub.server.utils.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +21,7 @@ import java.util.Optional;
  * @date :2021/2/23 11:23
  */
 @Slf4j
-public abstract class AbstractCrudService<DOMAIN,ID> implements CrudService<DOMAIN,ID> {
+public abstract class AbstractCrudService<DOMAIN extends BaseEntity,ID> implements CrudService<DOMAIN,ID> {
 
     private final BaseDao<DOMAIN,ID> baseDao;
     private final String domainName;
@@ -108,6 +110,14 @@ public abstract class AbstractCrudService<DOMAIN,ID> implements CrudService<DOMA
     @Override
     public List<DOMAIN> updateInBatch(Collection<DOMAIN> domains) {
         return CollectionUtils.isEmpty(domains) ? Collections.emptyList() : baseDao.saveAll(domains);
+    }
+
+    @Override
+    public DOMAIN createOrUpdate(DOMAIN domain) {
+        if (ServiceUtils.isEmptyId(domain.getId())){
+            return create(domain);
+        }
+        return update(domain);
     }
 
     @Override

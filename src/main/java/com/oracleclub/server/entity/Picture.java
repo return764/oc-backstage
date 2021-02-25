@@ -1,7 +1,9 @@
 package com.oracleclub.server.entity;
 
 import com.oracleclub.server.entity.base.BaseEntity;
+import com.oracleclub.server.entity.enums.PictureStatus;
 import lombok.Data;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -49,7 +51,8 @@ public class Picture extends BaseEntity implements Serializable {
      * 图片状态
      */
     @Column
-    private int status;
+    @ColumnDefault("0")
+    private PictureStatus status;
     @Column(name = "media_type")
     private String mediaType;
     @Column
