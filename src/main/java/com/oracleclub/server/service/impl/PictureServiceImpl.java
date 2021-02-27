@@ -77,7 +77,9 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
     @Override
     public Picture upload(MultipartFile file) {
         Assert.notNull(file,"Picture upload must not be null");
-        log.debug("开始上传图片... 类型:[{}]");
+        log.debug("开始上传图片... 类型:[{}]",file.getContentType());
+
+
         return null;
     }
 

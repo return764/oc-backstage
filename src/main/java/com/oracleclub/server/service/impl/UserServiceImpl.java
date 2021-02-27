@@ -150,4 +150,10 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         tokenCache.put(String.valueOf(user.getId()), token);
         return authUser;
     }
+
+    //todo bug
+    @Override
+    public User removeSoftById(Long aLong) {
+        return null;
+    }
 }

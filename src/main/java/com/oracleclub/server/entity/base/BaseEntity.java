@@ -3,6 +3,7 @@ package com.oracleclub.server.entity.base;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -17,6 +18,8 @@ import java.util.Date;
 public class BaseEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "custom-id")
+    @GenericGenerator(name="custom-id",strategy = "com.oracleclub.server.entity.support.CustomIdGenerator")
     private Long id;
 
     @Column(name = "created_at")

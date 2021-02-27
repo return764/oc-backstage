@@ -93,6 +93,19 @@
             <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>net.sf.image4j</groupId>
+            <artifactId>image4j</artifactId>
+            <version>0.7zensight1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.13</version>
+        </dependency>
+
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
