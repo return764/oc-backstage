@@ -4,7 +4,6 @@ import com.oracleclub.server.entity.Picture;
 import com.oracleclub.server.entity.vo.PictureVo;
 import com.oracleclub.server.service.base.ConverterService;
 import com.oracleclub.server.service.base.CrudService;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,7 +20,5 @@ public interface PictureService extends CrudService<Picture,Long>, ConverterServ
     PictureVo createBy(Picture picture);
 
     PictureVo updateBy(Picture picture);
-
-    Picture upload(MultipartFile file);
 
 }

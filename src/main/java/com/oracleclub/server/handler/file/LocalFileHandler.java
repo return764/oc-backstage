@@ -1,10 +1,11 @@
 package com.oracleclub.server.handler.file;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import com.oracleclub.server.config.properties.AppProperties;
+import com.oracleclub.server.entity.enums.AttachmentType;
 import com.oracleclub.server.entity.support.UploadResult;
 import com.oracleclub.server.exception.FileOperationException;
-import com.oracleclub.server.utils.FilenameUtils;
 import com.oracleclub.server.utils.ImageUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
@@ -63,7 +64,6 @@ public class LocalFileHandler implements FileHandler{
     @Override
     public UploadResult upload(MultipartFile file) {
         Assert.notNull(file,"上传文件不能为空");
-
         Calendar current = Calendar.getInstance();
 
         int year = current.get(Calendar.YEAR);
@@ -72,9 +72,9 @@ public class LocalFileHandler implements FileHandler{
         String monthStr = month > 10 ? String.valueOf(month) : "0"+month;
 
         String uploadDir = UPLOAD_DIR + year + FILE_SEPARATOR + monthStr + FILE_SEPARATOR;
-        String orgBasename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
+        String orgBasename = FileUtil.mainName(Objects.requireNonNull(file.getOriginalFilename()));
 
-        String ext = FilenameUtils.getExtension(file.getOriginalFilename());
+        String ext = FileUtil.extName(file.getOriginalFilename());
         String basename =  orgBasename + "-" + IdUtil.fastSimpleUUID();
 
         log.debug("基本名称:[{}],后缀:[{}],原文件名:[{}]",basename,ext,file.getOriginalFilename());
@@ -95,6 +95,7 @@ public class LocalFileHandler implements FileHandler{
             UploadResult uploadResult = new UploadResult();
             uploadResult.setFileName(orgBasename);
             uploadResult.setFilePath(subFilePath);
+            uploadResult.setKey(subFilePath);
             uploadResult.setSuffix(ext);
             uploadResult.setSize(file.getSize());
             uploadResult.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
@@ -129,8 +130,37 @@ public class LocalFileHandler implements FileHandler{
     }
 
     @Override
-    public void delete(String path) {
+    public void delete(String key) {
+        Assert.hasText(key, "File key must not be blank");
 
+        Path filePath = Paths.get(workDir, key);
+
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            throw new FileOperationException("附件 " + key + " 删除失败", e);
+        }
+
+        String basename = FileUtil.mainName(key);
+        String extension = FileUtil.extName(key);
+
+        String thumbnailName = basename + THUMBNAIL_SUFFIX + '.' + extension;
+
+        Path thumbnailPath = Paths.get(filePath.getParent().toString(), thumbnailName);
+
+        try {
+            boolean deleteResult = Files.deleteIfExists(thumbnailPath);
+            if (!deleteResult) {
+                log.warn("Thumbnail: [{}] may not exist", thumbnailPath.toString());
+            }
+        } catch (IOException e) {
+            throw new FileOperationException("附件缩略图 " + thumbnailName + " 删除失败", e);
+        }
+    }
+
+    @Override
+    public AttachmentType getAttachmentType() {
+        return AttachmentType.LOCAL;
     }
 
     private boolean generateThumbnail(BufferedImage originalImage, Path thumbPath, String extension) {

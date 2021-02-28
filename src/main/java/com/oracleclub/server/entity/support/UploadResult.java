@@ -14,6 +14,7 @@ public class UploadResult {
 
     private String fileName;
     private String filePath;
+    private String key;
     private String thumbPath;
     private String suffix;
     private MediaType mediaType;

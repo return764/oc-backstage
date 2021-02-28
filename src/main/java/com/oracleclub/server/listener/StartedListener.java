@@ -43,7 +43,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
                 log.info("创建工作目录: [{}]", workPath);
             }
         }catch (IOException e){
-
+            throw new RuntimeException("创建目录失败",e);
         }
     }
 }

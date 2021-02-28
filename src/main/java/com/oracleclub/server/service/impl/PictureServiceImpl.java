@@ -4,15 +4,16 @@ import com.oracleclub.server.dao.PictureDao;
 import com.oracleclub.server.entity.Picture;
 import com.oracleclub.server.entity.enums.PictureStatus;
 import com.oracleclub.server.entity.vo.PictureVo;
+import com.oracleclub.server.handler.file.FileHandler;
 import com.oracleclub.server.service.PictureService;
 import com.oracleclub.server.service.base.AbstractCrudService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
@@ -29,10 +30,12 @@ import java.util.stream.Collectors;
 public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implements PictureService {
 
     private final PictureDao pictureDao;
+    private final FileHandler fileHandler;
 
-    protected PictureServiceImpl(PictureDao pictureDao) {
+    protected PictureServiceImpl(PictureDao pictureDao,@Qualifier(value = "localFileHandler") FileHandler fileHandler) {
         super(pictureDao);
         this.pictureDao = pictureDao;
+        this.fileHandler = fileHandler;
     }
 
     @Override
@@ -72,15 +75,6 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
     @Override
     public PictureVo updateBy(Picture picture) {
         return convertToVO(update(picture));
-    }
-
-    @Override
-    public Picture upload(MultipartFile file) {
-        Assert.notNull(file,"Picture upload must not be null");
-        log.debug("开始上传图片... 类型:[{}]",file.getContentType());
-
-
-        return null;
     }
 
     @Override

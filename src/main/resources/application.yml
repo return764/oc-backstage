@@ -31,5 +31,10 @@ spring:
       ddl-auto: update
     show-sql: true
     open-in-view: false
+logging:
+  level:
+    com.oracleclub.server: DEBUG
+  file:
+    path: ${user.home}/.oc/logs
 
 
