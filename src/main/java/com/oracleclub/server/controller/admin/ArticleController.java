@@ -59,7 +59,7 @@ public class ArticleController {
                            @RequestParam(name = "soft",required = false,defaultValue = "true") boolean soft){
         Article article = new Article();
         if (soft){
-            article = articleService.removeSoftById(id);
+            article = articleService.removeLogicById(id);
         }else {
             article = articleService.removeById(id);
         }

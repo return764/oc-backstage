@@ -65,7 +65,7 @@ public interface CrudService<DOMAIN,ID> {
 
     @Transactional
     @NonNull
-    DOMAIN removeSoftById(@NonNull ID id);
+    DOMAIN removeLogicById(@NonNull ID id);
 
     @Transactional
     @Nullable

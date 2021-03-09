@@ -69,7 +69,7 @@ public class PictureController {
                            @RequestParam(value = "soft",defaultValue = "true")boolean soft){
         Picture picture = new Picture();
         if (soft){
-            picture = pictureService.removeSoftById(id);
+            picture = pictureService.removeLogicById(id);
         }else {
             picture = pictureService.removeById(id);
         }

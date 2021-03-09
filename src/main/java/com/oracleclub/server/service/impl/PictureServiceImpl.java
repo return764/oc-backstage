@@ -15,7 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -75,15 +74,6 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
     @Override
     public PictureVo updateBy(Picture picture) {
         return convertToVO(update(picture));
-    }
-
-    @Override
-    public Picture removeSoftById(Long id) {
-        Picture picture = getById(id);
-        picture.setStatus(PictureStatus.DELETED);
-        picture.setDeletedAt(new Date());
-
-        return update(picture);
     }
 
 

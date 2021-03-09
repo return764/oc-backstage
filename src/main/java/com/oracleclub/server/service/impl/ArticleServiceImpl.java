@@ -194,12 +194,4 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
         increaseLike(1,articleId);
     }
 
-    @Override
-    public Article removeSoftById(Long id) {
-        Article article = getById(id);
-        article.setStatus(ArticleStatus.DELETED);
-        article.setDeletedAt(new Date());
-
-        return update(article);
-    }
 }

@@ -151,9 +151,4 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         return authUser;
     }
 
-    //todo bug
-    @Override
-    public User removeSoftById(Long aLong) {
-        return null;
-    }
 }

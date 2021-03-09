@@ -58,8 +58,8 @@ public abstract class AbstractCrudService<DOMAIN extends BaseEntity,ID> implemen
     @Override
     public Optional<DOMAIN> fetchById(ID id) {
         Assert.notNull(id, domainName + " id must not be null");
-
-        return baseDao.findById(id);
+        //todo 排除删除的查询
+        return baseDao.findByIdWithExist(id);
     }
 
     @Override
@@ -141,6 +141,13 @@ public abstract class AbstractCrudService<DOMAIN extends BaseEntity,ID> implemen
         Assert.notNull(domain, domainName + " data must not be null");
 
         baseDao.delete(domain);
+    }
+
+    @Override
+    public DOMAIN removeLogicById(ID id) {
+        Assert.notNull(id,"id must not be null");
+
+        return baseDao.logicDelete(id);
     }
 
     @Override
