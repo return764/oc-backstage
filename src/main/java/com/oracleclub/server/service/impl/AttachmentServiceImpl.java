@@ -107,7 +107,7 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
                         cb.like(root.get("name").as(String.class),"%"+attachmentParam.getName().trim()+"%")
                 ));
             }
-
+            System.out.println(predicates.size());
             return cq.where(predicates.toArray(new Predicate[0])).getRestriction();
         };
     }

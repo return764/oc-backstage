@@ -29,7 +29,8 @@ public class AttachmentController {
 
     @GetMapping
     public R listAttachment(@PageableDefault(sort = "id",direction = Sort.Direction.DESC) Pageable pageable,
-                            @RequestParam AttachmentParam attachmentParam){
+                            AttachmentParam attachmentParam){
+
         return R.success("获取附件列表成功",attachmentService.pageByParam(pageable, attachmentParam));
     }
 

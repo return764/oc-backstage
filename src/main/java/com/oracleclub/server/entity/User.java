@@ -7,9 +7,7 @@ import com.oracleclub.server.entity.enums.UserStatus;
 import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -24,9 +22,6 @@ import java.util.Date;
 @Table(name = "users")
 public class User extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 779866878072284592L;
-
-    @Column(name = "dep_id")
-    private Long depId;
     /**
      * 用户昵称
      */
@@ -68,4 +63,8 @@ public class User extends BaseEntity implements Serializable {
     private Long ipAddr;
     @Column
     private Date loginAt;
+
+    @OneToOne(targetEntity = Department.class)
+    @JoinColumn(name = "dep_id")
+    private Department department;
 }

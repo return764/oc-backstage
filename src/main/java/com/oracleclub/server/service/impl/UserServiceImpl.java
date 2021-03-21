@@ -4,9 +4,8 @@ import cn.hutool.crypto.digest.DigestUtil;
 import com.oracleclub.server.dao.UserDao;
 import com.oracleclub.server.entity.User;
 import com.oracleclub.server.entity.vo.AuthUserVO;
-import com.oracleclub.server.entity.vo.UserInfoVO;
+import com.oracleclub.server.entity.vo.UserVO;
 import com.oracleclub.server.exception.LoginException;
-import com.oracleclub.server.exception.UserException;
 import com.oracleclub.server.exception.VerifyCodeException;
 import com.oracleclub.server.service.UserService;
 import com.oracleclub.server.service.base.AbstractCrudService;
@@ -15,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ehcache.Cache;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.util.List;
 
 /**
  * (User)表服务实现类
@@ -99,11 +100,8 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         String matchVerifyCode = verifyCodeCache.get(email);
         if (verifyCode.equals(matchVerifyCode)) {
             User u = userDao.findByEmail(email);
-            if (u != null) {
-                log.debug("邮箱验证码登录成功");
-                return getAuthUser(u);
-            }
-            throw new UserException("用户不存在");
+            log.debug("当前登录用户:[{}]",u);
+            return getAuthUser(u);
         }
         throw new VerifyCodeException("验证码错误");
     }
@@ -111,6 +109,7 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
     @Override
     public AuthUserVO loginEmail(String email, String password) {
         User u = userDao.findByEmail(email);
+        log.debug("当前登录用户:[{}]",u);
         if(checkPassword(u,password)){
             return getAuthUser(u);
         }
@@ -120,6 +119,7 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
     @Override
     public AuthUserVO loginStuNum(String stuNum, String password) {
         User u = userDao.findByStuNum(stuNum);
+        log.debug("当前登录用户:[{}]",u);
         if(checkPassword(u,password)){
             return getAuthUser(u);
         }
@@ -135,9 +135,19 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
     }
 
     @Override
-    public UserInfoVO convertToInfoVo(User user) {
-        Assert.notNull(user,"User must not be null");
-        return new UserInfoVO().convertFrom(user);
+    public UserVO convertToVO(User user) {
+        Assert.notNull(user,"用户不存在");
+        return new UserVO().convertFrom(user);
+    }
+
+    @Override
+    public List<UserVO> convertToListVO(List<User> users) {
+        return null;
+    }
+
+    @Override
+    public Page<UserVO> convertToPageVO(Page<User> users) {
+        return null;
     }
 
     private AuthUserVO getAuthUser(User user) {
@@ -146,6 +156,7 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         if (null == token) {
             token = JwtUtil.signUser(user.getId());
         }
+        authUser.setDepartmentName(user.getDepartment().getName());
         authUser.setToken(token);
         tokenCache.put(String.valueOf(user.getId()), token);
         return authUser;

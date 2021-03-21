@@ -85,7 +85,7 @@ public class BaseDaoImpl<DOMAIN extends BaseEntity, ID> extends SimpleJpaReposit
             Predicate p = criteriaBuilder.conjunction();
 
             p = criteriaBuilder.and(p,criteriaBuilder.equal(root.get("id").as(Long.class),id));
-            p = criteriaBuilder.and(p,criteriaBuilder.isNull(root.get("deleted_at")));
+            p = criteriaBuilder.and(p,criteriaBuilder.isNull(root.get("deletedAt")));
 
             return criteriaQuery.where(p).getRestriction();
         });
@@ -95,7 +95,7 @@ public class BaseDaoImpl<DOMAIN extends BaseEntity, ID> extends SimpleJpaReposit
         return ((root, criteriaQuery, criteriaBuilder) -> {
             Predicate p = criteriaBuilder.conjunction();
 
-            p = criteriaBuilder.and(p,criteriaBuilder.isNull(root.get("deleted_at")));
+            p = criteriaBuilder.and(p,criteriaBuilder.isNull(root.get("deletedAt")));
 
             return criteriaQuery.where(p).getRestriction();
         });

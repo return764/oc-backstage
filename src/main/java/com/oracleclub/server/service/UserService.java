@@ -2,7 +2,8 @@ package com.oracleclub.server.service;
 
 import com.oracleclub.server.entity.User;
 import com.oracleclub.server.entity.vo.AuthUserVO;
-import com.oracleclub.server.entity.vo.UserInfoVO;
+import com.oracleclub.server.entity.vo.UserVO;
+import com.oracleclub.server.service.base.ConverterService;
 import com.oracleclub.server.service.base.CrudService;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author RETURN
  * @since 2020-08-13 22:01:00
  */
-public interface UserService extends CrudService<User,Long> {
+public interface UserService extends CrudService<User,Long>, ConverterService<UserVO,User> {
 
     /**
      * 用户修改头像
@@ -68,6 +69,6 @@ public interface UserService extends CrudService<User,Long> {
 
     boolean checkPassword(User user,String password);
 
-    UserInfoVO convertToInfoVo(User user);
+    UserVO convertToVO(User user);
 
 }

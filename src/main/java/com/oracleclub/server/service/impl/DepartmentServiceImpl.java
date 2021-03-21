@@ -1,39 +1,48 @@
 package com.oracleclub.server.service.impl;
 
+import com.oracleclub.server.dao.DepartmentDao;
 import com.oracleclub.server.entity.Department;
+import com.oracleclub.server.entity.vo.DepartmentVO;
 import com.oracleclub.server.service.DepartmentService;
+import com.oracleclub.server.service.base.AbstractCrudService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author :RETURN
  * @date :2021/2/21 18:27
  */
 @Service
-public class DepartmentServiceImpl implements DepartmentService {
-    @Override
-    public Department queryById(Long id) {
-        return null;
+@Slf4j
+public class DepartmentServiceImpl extends AbstractCrudService<Department,Long> implements DepartmentService {
+
+    private DepartmentDao departmentDao;
+
+    protected DepartmentServiceImpl(DepartmentDao departmentDao) {
+        super(departmentDao);
     }
 
     @Override
-    public List<Department> queryAllByLimit(int offset, int limit) {
-        return null;
+    public DepartmentVO convertToVO(Department department) {
+        return new DepartmentVO().convertFrom(department);
     }
 
     @Override
-    public Department insert(Department departments) {
-        return null;
+    public List<DepartmentVO> convertToListVO(List<Department> departments) {
+        Assert.notNull(departments,"待转换的部门列表不能为空");
+
+        return departments.stream().map(this::convertToVO).collect(Collectors.toList());
     }
 
     @Override
-    public Department update(Department departments) {
-        return null;
-    }
+    public Page<DepartmentVO> convertToPageVO(Page<Department> departments) {
+        Assert.notNull(departments,"待转换的部门列表不能为空");
 
-    @Override
-    public boolean deleteById(Long id) {
-        return false;
+        return departments.map(this::convertToVO) ;
     }
 }

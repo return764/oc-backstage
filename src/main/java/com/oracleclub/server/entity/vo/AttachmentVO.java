@@ -5,6 +5,8 @@ import com.oracleclub.server.entity.Attachment;
 import com.oracleclub.server.entity.enums.AttachmentType;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @author :RETURN
  * @date :2021/2/28 0:33
@@ -12,6 +14,7 @@ import lombok.Data;
 @Data
 public class AttachmentVO implements OutputConverter<AttachmentVO, Attachment> {
 
+    private Long id;
     private String name;
     private String path;
     private String key;
@@ -22,4 +25,5 @@ public class AttachmentVO implements OutputConverter<AttachmentVO, Attachment> {
     private Integer height;
     private Long size;
     private AttachmentType type;
+    private Date createdAt;
 }

@@ -1,35 +1,37 @@
 package com.oracleclub.server.controller.admin;
 
-import com.oracleclub.server.entity.Department;
+import com.oracleclub.server.entity.vo.R;
 import com.oracleclub.server.service.DepartmentService;
-import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
 /**
- * (Departments)表控制层
- *
- * @author makejava
+ * @author RETURN
  * @since 2021-02-21 17:11:56
  */
+@Slf4j
 @RestController
-@RequestMapping("department")
+@RequestMapping("api/admin/departments")
 public class DepartmentController {
-    /**
-     * 服务对象
-     */
+
+
     @Resource
     private DepartmentService departmentService;
 
-    /**
-     * 通过主键查询单条数据
-     *
-     * @param id 主键
-     * @return 单条数据
-     */
-    @GetMapping("selectOne")
-    public Department selectOne(Long id) {
-        return this.departmentService.queryById(id);
+
+    @GetMapping("{id:\\d+}")
+    public R getOne(@PathVariable Long id) {
+        return R.success("获取部门成功",this.departmentService.getById(id));
+    }
+
+    @GetMapping
+    public R listDepartment(){
+        return R.success("获取部门列表成功",this.departmentService.listAll());
     }
 
 }

@@ -1,12 +1,16 @@
 package com.oracleclub.server.controller;
 
-import com.oracleclub.server.entity.support.AppConstant;
+import com.oracleclub.server.dao.UserDao;
+import com.oracleclub.server.entity.Department;
+import com.oracleclub.server.entity.User;
+import com.oracleclub.server.entity.enums.RoleEnum;
+import com.oracleclub.server.entity.enums.UserStatus;
 import com.oracleclub.server.entity.vo.R;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * @author :RETURN
@@ -15,18 +19,31 @@ import java.nio.file.Paths;
 @RestController
 public class CommonController {
 
+    @Resource
+    UserDao userDao;
+
     @GetMapping("ping")
     public R ping(){
 
-        Path path = Paths.get(AppConstant.USER_HOME,".oc","upload/file/","sdxcsd.png");
+        User u = new User();
+        u.setAvatar("asdasdasd.png");
+        u.setBirthday(new Date());
+        u.setEmail("5438514362qq.com");
+        u.setInfo("asdasfxcvxcvxcv");
+        u.setIpAddr(1344643131L);
+        u.setName("小明");
+        u.setNickname("asfsafasf");
+        u.setRole(RoleEnum.NORMAL);
+        u.setStatus(UserStatus.ACTIVE);
+        u.setPassword("123456");
+        u.setPhNum("12354548315");
+        u.setStuNum("41804404");
 
-        System.out.println(path);
-        System.out.println(path.getFileName());
-        System.out.println(path.getRoot());
-        System.out.println(path.getParent());
-        System.out.println(path.getNameCount());
-        System.out.println(path.normalize().toString());
+        Department department = new Department();
+        department.setId(1L);
 
-        return R.success("pong");
+        u.setDepartment(department);
+
+        return R.success("pong",userDao.save(u));
     }
 }
