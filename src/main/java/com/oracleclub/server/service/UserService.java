@@ -1,10 +1,13 @@
 package com.oracleclub.server.service;
 
 import com.oracleclub.server.entity.User;
+import com.oracleclub.server.entity.param.UserParam;
 import com.oracleclub.server.entity.vo.AuthUserVO;
 import com.oracleclub.server.entity.vo.UserVO;
 import com.oracleclub.server.service.base.ConverterService;
 import com.oracleclub.server.service.base.CrudService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -69,6 +72,6 @@ public interface UserService extends CrudService<User,Long>, ConverterService<Us
 
     boolean checkPassword(User user,String password);
 
-    UserVO convertToVO(User user);
+    Page<UserVO> pageByParam(Pageable pageable, UserParam userParam);
 
 }

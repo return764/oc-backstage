@@ -28,4 +28,5 @@ public class UserVO implements OutputConverter<UserVO, User> {
     private Date loginAt;
     private Date createdAt;
     private Date updatedAt;
+    private DepartmentVO department;
 }

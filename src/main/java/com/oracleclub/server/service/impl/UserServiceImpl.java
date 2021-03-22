@@ -2,8 +2,11 @@ package com.oracleclub.server.service.impl;
 
 import cn.hutool.crypto.digest.DigestUtil;
 import com.oracleclub.server.dao.UserDao;
+import com.oracleclub.server.entity.Department;
 import com.oracleclub.server.entity.User;
+import com.oracleclub.server.entity.param.UserParam;
 import com.oracleclub.server.entity.vo.AuthUserVO;
+import com.oracleclub.server.entity.vo.DepartmentVO;
 import com.oracleclub.server.entity.vo.UserVO;
 import com.oracleclub.server.exception.LoginException;
 import com.oracleclub.server.exception.VerifyCodeException;
@@ -15,6 +18,8 @@ import org.ehcache.Cache;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -24,7 +29,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.persistence.criteria.Predicate;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * (User)表服务实现类
@@ -135,19 +144,72 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
     }
 
     @Override
+    public Page<UserVO> pageByParam(Pageable pageable, UserParam userParam) {
+        Assert.notNull(pageable,"分页参数不能为空");
+        Page<User> all = userDao.findAllWithExist(buildParam(userParam), pageable);
+        return convertToPageVO(all);
+    }
+
+    private static Specification<User> buildParam(UserParam userParam){
+        Assert.notNull(userParam,"用户列表查询数据不能为空");
+
+        return (Specification<User>) (root, cq, cb) -> {
+            List<Predicate> predicates = new LinkedList<>();
+
+            if (userParam.getName() != null){
+                predicates.add(cb.like(root.get("name").as(String.class),"%"+userParam.getName()+"%"));
+            }
+
+            if (userParam.getDepId() != null){
+                predicates.add(cb.equal(root.get("depId").as(Long.class),userParam.getDepId()));
+            }
+
+            if (userParam.getEmail() != null){
+                predicates.add(cb.like(root.get("email").as(String.class),"%"+userParam.getEmail()+"%"));
+            }
+
+            if (userParam.getPhNum() != null){
+                predicates.add(cb.like(root.get("phNum").as(String.class),"%"+userParam.getPhNum()+"%"));
+            }
+
+            if (userParam.getStuNum() != null){
+                predicates.add(cb.like(root.get("stuNum").as(String.class),"%"+userParam.getStuNum()+"%"));
+            }
+
+            if (userParam.getLoginStart() != null){
+                predicates.add(cb.greaterThanOrEqualTo(root.get("loginAt").as(Date.class),userParam.getLoginStart()));
+            }
+
+            if (userParam.getLoginEnd() != null){
+                predicates.add(cb.lessThanOrEqualTo(root.get("loginAt").as(Date.class),userParam.getLoginEnd()));
+            }
+
+
+            return cq.where(predicates.toArray(new Predicate[0])).getRestriction();
+        };
+    }
+
+    @Override
     public UserVO convertToVO(User user) {
         Assert.notNull(user,"用户不存在");
-        return new UserVO().convertFrom(user);
+
+        UserVO userVO = new UserVO().convertFrom(user);
+
+        Department department = user.getDepartment();
+        if (department != null){
+            userVO.setDepartment(new DepartmentVO().convertFrom(department));
+        }
+        return userVO;
     }
 
     @Override
     public List<UserVO> convertToListVO(List<User> users) {
-        return null;
+        return users.stream().map(this::convertToVO).collect(Collectors.toList());
     }
 
     @Override
     public Page<UserVO> convertToPageVO(Page<User> users) {
-        return null;
+        return users.map(this::convertToVO);
     }
 
     private AuthUserVO getAuthUser(User user) {
