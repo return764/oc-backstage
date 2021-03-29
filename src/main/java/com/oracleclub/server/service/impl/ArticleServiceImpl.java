@@ -2,8 +2,10 @@ package com.oracleclub.server.service.impl;
 
 import com.oracleclub.server.dao.ArticleDao;
 import com.oracleclub.server.entity.Article;
-import com.oracleclub.server.entity.vo.ArticleDetailVO;
 import com.oracleclub.server.entity.enums.ArticleStatus;
+import com.oracleclub.server.entity.param.ArticleQueryParam;
+import com.oracleclub.server.entity.vo.ArticleDetailVO;
+import com.oracleclub.server.entity.vo.ArticleSimpleVO;
 import com.oracleclub.server.exception.NotFoundException;
 import com.oracleclub.server.exception.ServiceException;
 import com.oracleclub.server.service.ArticleService;
@@ -14,10 +16,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
+import javax.persistence.criteria.Predicate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -79,11 +84,55 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
     }
 
     @Override
-    public Page<Article> pageBy(ArticleStatus status, Pageable pageable) {
-        Assert.notNull(status, "Article status must not be null");
+    public Page<Article> pageBy(ArticleQueryParam queryParam, Pageable pageable) {
         Assert.notNull(pageable, "Page info must not be null");
 
-        return articleDao.findAllByStatus(status,pageable);
+        return articleDao.findAllWithExist(buildQuery(queryParam),pageable);
+    }
+
+    @Override
+    public ArticleSimpleVO convertToSimple(Article article) {
+        Assert.notNull(article,"Article must not be null");
+
+        return new ArticleSimpleVO().convertFrom(article);
+    }
+
+    @Override
+    public Page<ArticleSimpleVO> convertToSimplePage(Page<Article> articles) {
+        return articles.map(this::convertToSimple);
+    }
+
+    private Specification<Article> buildQuery(ArticleQueryParam queryParam) {
+        Assert.notNull(queryParam, "文章查询参数不能为空");
+
+        return (Specification<Article>)(root, cq, cb) -> {
+            List<Predicate> predicates = new LinkedList<>();
+            if (queryParam.getAuthor() != null){
+                predicates.add(cb.like(root.get("author").as(String.class),"%"+queryParam.getAuthor()+"%"));
+            }
+
+            if (queryParam.getTitle() != null){
+                predicates.add(cb.like(root.get("title").as(String.class),"%"+queryParam.getTitle()+"%"));
+            }
+
+            if (queryParam.getDescription() != null){
+                predicates.add(cb.like(root.get("description").as(String.class),"%"+queryParam.getDescription()+"%"));
+            }
+
+            if (queryParam.getStatus() != null){
+                predicates.add(cb.equal(root.get("status").as(ArticleStatus.class),queryParam.getStatus()));
+            }
+
+            if (queryParam.getCreatedStart() != null){
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt").as(LocalDateTime.class),queryParam.getCreatedStart()));
+            }
+
+            if (queryParam.getCreatedEnd() != null){
+                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt").as(LocalDateTime.class),queryParam.getCreatedEnd()));
+            }
+
+            return cq.where(predicates.toArray(new Predicate[0])).getRestriction();
+        };
     }
 
     @Override
@@ -93,7 +142,7 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
 
     @Override
     public ArticleDetailVO updateBy(Article article) {
-        article.setUpdatedAt(new Date());
+        article.setUpdatedAt(LocalDateTime.now());
         return createOrUpdateBy(article);
     }
 

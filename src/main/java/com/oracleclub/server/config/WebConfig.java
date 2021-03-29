@@ -54,4 +54,5 @@ public class WebConfig implements WebMvcConfigurer {
                 .setCacheControl(CacheControl.maxAge(7L, TimeUnit.DAYS))
                 .addResourceLocations(workDir + "upload/");
     }
+
 }

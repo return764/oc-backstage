@@ -25,6 +25,7 @@ public class DepartmentServiceImpl extends AbstractCrudService<Department,Long> 
 
     protected DepartmentServiceImpl(DepartmentDao departmentDao) {
         super(departmentDao);
+        this.departmentDao = departmentDao;
     }
 
     @Override
@@ -44,5 +45,20 @@ public class DepartmentServiceImpl extends AbstractCrudService<Department,Long> 
         Assert.notNull(departments,"待转换的部门列表不能为空");
 
         return departments.map(this::convertToVO) ;
+    }
+
+    @Override
+    public DepartmentVO createOrUpdateBy(Department department) {
+        return convertToVO(createOrUpdate(department));
+    }
+
+    @Override
+    public DepartmentVO createBy(Department department) {
+        return createOrUpdateBy(department);
+    }
+
+    @Override
+    public List<Department> listAllExist() {
+        return departmentDao.findAllWithExist();
     }
 }

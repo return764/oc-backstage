@@ -1,5 +1,7 @@
 package com.oracleclub.server.entity.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.oracleclub.server.converter.OutputConverter;
 import com.oracleclub.server.entity.Picture;
 import lombok.Data;
@@ -12,6 +14,8 @@ import java.util.Date;
  */
 @Data
 public class PictureDetailVO implements OutputConverter<PictureDetailVO, Picture> {
+
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     private String path;
     private Date uploadTime;

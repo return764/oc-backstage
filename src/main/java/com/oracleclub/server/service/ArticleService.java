@@ -2,7 +2,9 @@ package com.oracleclub.server.service;
 
 import com.oracleclub.server.entity.Article;
 import com.oracleclub.server.entity.enums.ArticleStatus;
+import com.oracleclub.server.entity.param.ArticleQueryParam;
 import com.oracleclub.server.entity.vo.ArticleDetailVO;
+import com.oracleclub.server.entity.vo.ArticleSimpleVO;
 import com.oracleclub.server.service.base.ConverterService;
 import com.oracleclub.server.service.base.CrudService;
 import org.springframework.data.domain.Page;
@@ -29,7 +31,11 @@ public interface ArticleService extends CrudService<Article,Long>, ConverterServ
 
     Page<Article> pageBy(Pageable pageable);
 
-    Page<Article> pageBy(ArticleStatus status,Pageable pageable);
+    Page<Article> pageBy(ArticleQueryParam queryParam, Pageable pageable);
+
+    ArticleSimpleVO convertToSimple(Article article);
+
+    Page<ArticleSimpleVO> convertToSimplePage(Page<Article> articles);
 
     ArticleDetailVO createBy(Article article);
 

@@ -1,12 +1,14 @@
 package com.oracleclub.server.entity.base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @author :RETURN
@@ -20,21 +22,22 @@ public class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "custom-id")
     @GenericGenerator(name="custom-id",strategy = "com.oracleclub.server.entity.support.CustomIdGenerator")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     @Column(name = "created_at")
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @Column(name = "deleted_at")
     @JsonIgnore
-    private Date deletedAt;
+    private LocalDateTime deletedAt;
 
     @PrePersist
     protected void prePersist(){
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
         if (createdAt == null){
             createdAt = now;
         }
@@ -45,11 +48,11 @@ public class BaseEntity {
 
     @PreUpdate
     protected void preUpdate(){
-        updatedAt = new Date();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreRemove
     protected void preRemove(){
-        deletedAt = new Date();
+        deletedAt = LocalDateTime.now();
     }
 }

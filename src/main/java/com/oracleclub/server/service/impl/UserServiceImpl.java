@@ -4,7 +4,8 @@ import cn.hutool.crypto.digest.DigestUtil;
 import com.oracleclub.server.dao.UserDao;
 import com.oracleclub.server.entity.Department;
 import com.oracleclub.server.entity.User;
-import com.oracleclub.server.entity.param.UserParam;
+import com.oracleclub.server.entity.enums.UserStatus;
+import com.oracleclub.server.entity.param.UserQueryParam;
 import com.oracleclub.server.entity.vo.AuthUserVO;
 import com.oracleclub.server.entity.vo.DepartmentVO;
 import com.oracleclub.server.entity.vo.UserVO;
@@ -30,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.persistence.criteria.Predicate;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -144,13 +145,13 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
     }
 
     @Override
-    public Page<UserVO> pageByParam(Pageable pageable, UserParam userParam) {
+    public Page<UserVO> pageByParam(Pageable pageable, UserQueryParam userParam) {
         Assert.notNull(pageable,"分页参数不能为空");
         Page<User> all = userDao.findAllWithExist(buildParam(userParam), pageable);
         return convertToPageVO(all);
     }
 
-    private static Specification<User> buildParam(UserParam userParam){
+    private static Specification<User> buildParam(UserQueryParam userParam){
         Assert.notNull(userParam,"用户列表查询数据不能为空");
 
         return (Specification<User>) (root, cq, cb) -> {
@@ -161,7 +162,7 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
             }
 
             if (userParam.getDepId() != null){
-                predicates.add(cb.equal(root.get("depId").as(Long.class),userParam.getDepId()));
+                predicates.add(cb.equal(root.join("department").get("id").as(Long.class),userParam.getDepId()));
             }
 
             if (userParam.getEmail() != null){
@@ -176,12 +177,16 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
                 predicates.add(cb.like(root.get("stuNum").as(String.class),"%"+userParam.getStuNum()+"%"));
             }
 
+            if (userParam.getStatus() != null){
+                predicates.add(cb.equal(root.get("status").as(UserStatus.class),userParam.getStatus()));
+            }
+
             if (userParam.getLoginStart() != null){
-                predicates.add(cb.greaterThanOrEqualTo(root.get("loginAt").as(Date.class),userParam.getLoginStart()));
+                predicates.add(cb.greaterThanOrEqualTo(root.get("loginAt").as(LocalDateTime.class),userParam.getLoginStart()));
             }
 
             if (userParam.getLoginEnd() != null){
-                predicates.add(cb.lessThanOrEqualTo(root.get("loginAt").as(Date.class),userParam.getLoginEnd()));
+                predicates.add(cb.lessThanOrEqualTo(root.get("loginAt").as(LocalDateTime.class),userParam.getLoginEnd()));
             }
 
 

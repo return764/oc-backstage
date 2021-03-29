@@ -29,7 +29,7 @@ public class AttachmentController {
 
     @GetMapping
     public R listAttachment(@PageableDefault(sort = "id",direction = Sort.Direction.DESC) Pageable pageable,
-                            @RequestBody(required = false) AttachmentParam attachmentParam){
+                            AttachmentParam attachmentParam){
 
         return R.success("获取附件列表成功",attachmentService.pageByParam(pageable, attachmentParam));
     }
@@ -65,7 +65,9 @@ public class AttachmentController {
 
     @PutMapping("{id:\\d+}")
     public R updateAttachmentName(@PathVariable Long id,
-            @RequestBody String name){
+            String name){
+        log.debug("id:{},name:{}",id,name);
+
         Attachment attachment = attachmentService.getById(id);
 
         attachment.setName(name);

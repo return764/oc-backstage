@@ -3,9 +3,11 @@ package com.oracleclub.server.controller.admin;
 import com.oracleclub.server.entity.Article;
 import com.oracleclub.server.entity.enums.ArticleStatus;
 import com.oracleclub.server.entity.param.ArticleParam;
+import com.oracleclub.server.entity.param.ArticleQueryParam;
 import com.oracleclub.server.entity.vo.ArticleDetailVO;
 import com.oracleclub.server.entity.vo.R;
 import com.oracleclub.server.service.ArticleService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -13,6 +15,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * (Articles)表控制层
@@ -20,6 +23,7 @@ import javax.annotation.Resource;
  * @author makejava
  * @since 2021-02-21 17:23:09
  */
+@Slf4j
 @RestController
 @RequestMapping("api/admin/articles")
 public class ArticleController {
@@ -38,9 +42,10 @@ public class ArticleController {
 
     @GetMapping
     public R pageBy(@PageableDefault(sort = "id",direction = Sort.Direction.DESC) Pageable pageable,
-                    @RequestParam(value = "status",required = false,defaultValue = "published") ArticleStatus status){
-        Page<Article> articles = articleService.pageBy(status, pageable);
-        return R.success("成功获取文章列表",articleService.convertToPageVO(articles));
+                    ArticleQueryParam queryParam){
+        log.debug("ArticleQueryParam:{}",queryParam);
+        Page<Article> articles = articleService.pageBy(queryParam, pageable);
+        return R.success("成功获取文章列表",articleService.convertToSimplePage(articles));
     }
 
     @GetMapping("latest")
@@ -64,6 +69,18 @@ public class ArticleController {
             article = articleService.removeById(id);
         }
         return R.success("删除文章成功",articleService.convertToVO(article));
+    }
+
+
+    @DeleteMapping
+    public R deleteUsersInBatch(@RequestBody List<Long> ids,
+                                @RequestParam(name = "soft",required = false,defaultValue = "true")boolean soft){
+        if (soft){
+            ids.forEach(articleService::removeLogicById);
+        }else {
+            articleService.removeInBatch(ids);
+        }
+        return R.success("成功删除文章列表");
     }
 
     @PutMapping("{id:\\d+}")

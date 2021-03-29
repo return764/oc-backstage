@@ -9,7 +9,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * (User)实体类
@@ -19,7 +19,7 @@ import java.util.Date;
  */
 @Data
 @Entity
-@Table(name = "users")
+@Table(name = "users",uniqueConstraints=@UniqueConstraint(columnNames="email"))
 public class User extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 779866878072284592L;
     /**
@@ -52,7 +52,7 @@ public class User extends BaseEntity implements Serializable {
     @Column
     private String avatar;
     @Column
-    private Date birthday;
+    private LocalDateTime birthday;
     @Column
     @ColumnDefault("0")
     private UserStatus status;
@@ -62,7 +62,7 @@ public class User extends BaseEntity implements Serializable {
     @Column
     private Long ipAddr;
     @Column
-    private Date loginAt;
+    private LocalDateTime loginAt;
 
     @OneToOne(targetEntity = Department.class)
     @JoinColumn(name = "dep_id")

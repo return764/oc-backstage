@@ -1,6 +1,7 @@
 package com.oracleclub.server.controller;
 
 import com.oracleclub.server.annotation.PassToken;
+import com.oracleclub.server.entity.param.LoginParam;
 import com.oracleclub.server.entity.vo.AuthUserVO;
 import com.oracleclub.server.entity.vo.R;
 import com.oracleclub.server.service.UserService;
@@ -8,10 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.ehcache.Cache;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 /**
  * (User)表控制层
@@ -58,7 +61,9 @@ public class UserController {
 
     @PassToken
     @PostMapping("login/email")
-    public R loginEmail(String email, String password) {
+    public R loginEmail(@RequestBody @Valid LoginParam loginParam) {
+        String email = loginParam.getUsername();
+        String password = loginParam.getPassword();
         log.debug("邮箱:{},密码:{}", email, password);
         Assert.notNull(email, "用户邮箱不能为空");
         Assert.notNull(password, "密码不能为空");
@@ -69,7 +74,9 @@ public class UserController {
 
     @PassToken
     @PostMapping("login/stuNum")
-    public R loginStuNum(String stuNum, String password) {
+    public R loginStuNum(@RequestBody @Valid LoginParam loginParam) {
+        String stuNum = loginParam.getUsername();
+        String password = loginParam.getPassword();
         log.debug("学号:{},密码:{}", stuNum, password);
         Assert.notNull(stuNum, "学号不能为空");
         Assert.notNull(password, "密码不能为空");

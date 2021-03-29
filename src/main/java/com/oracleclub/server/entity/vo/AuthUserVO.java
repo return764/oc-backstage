@@ -1,5 +1,7 @@
 package com.oracleclub.server.entity.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.oracleclub.server.converter.OutputConverter;
 import com.oracleclub.server.entity.User;
 import com.oracleclub.server.entity.enums.RoleEnum;
@@ -15,6 +17,7 @@ import java.util.Date;
 @Data
 public class AuthUserVO implements OutputConverter<AuthUserVO, User> {
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     private String departmentName;
     private String name;

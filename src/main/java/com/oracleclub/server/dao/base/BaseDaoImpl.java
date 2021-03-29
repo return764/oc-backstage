@@ -12,8 +12,8 @@ import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.Predicate;
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +35,7 @@ public class BaseDaoImpl<DOMAIN extends BaseEntity, ID> extends SimpleJpaReposit
 
     @Override
     public <S extends DOMAIN> S save(S entity) {
-        entity.setUpdatedAt(new Date());
+        entity.setUpdatedAt(LocalDateTime.now());
         return super.save(entity);
     }
 
@@ -53,7 +53,7 @@ public class BaseDaoImpl<DOMAIN extends BaseEntity, ID> extends SimpleJpaReposit
     public DOMAIN logicDelete(ID id) {
         DOMAIN domain = getOne(id);
 
-        domain.setDeletedAt(new Date());
+        domain.setDeletedAt(LocalDateTime.now());
 
         return save(domain);
     }
