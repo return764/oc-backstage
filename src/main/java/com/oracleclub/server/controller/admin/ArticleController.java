@@ -84,7 +84,7 @@ public class ArticleController {
     }
 
     @PutMapping("{id:\\d+}")
-    public R UpdateArticle(@PathVariable("id")Long id,
+    public R updateArticle(@PathVariable("id")Long id,
                            @RequestBody ArticleParam articleParam){
         Article article = articleService.getById(id);
 
@@ -92,5 +92,14 @@ public class ArticleController {
 
         ArticleDetailVO articleDetailVO = articleService.updateBy(article);
         return R.success("更新文章成功",articleDetailVO);
+    }
+
+
+    @PutMapping
+    public R updateArticleStatus(@RequestBody List<Long> ids,
+                                 @RequestParam ArticleStatus status){
+        log.debug("ids:{},articleStatus:{}",ids,status);
+        List<Article> articles = articleService.updateStatusByIds(status, ids);
+        return R.success("批量更新文章状态成功",articleService.convertToSimpleList(articles));
     }
 }

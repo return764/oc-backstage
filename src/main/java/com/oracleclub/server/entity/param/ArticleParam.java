@@ -5,6 +5,8 @@ import com.oracleclub.server.entity.Article;
 import com.oracleclub.server.entity.enums.ArticleStatus;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * @author :RETURN
  * @date :2021/2/22 16:33
@@ -16,4 +18,5 @@ public class ArticleParam implements InputConverter<Article> {
     private String content;
     private ArticleStatus status;
     private String coverImage;
+    private LocalDateTime createdAt;
 }

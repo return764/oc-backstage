@@ -102,6 +102,11 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
         return articles.map(this::convertToSimple);
     }
 
+    @Override
+    public List<ArticleSimpleVO> convertToSimpleList(List<Article> articles) {
+        return articles.stream().map(this::convertToSimple).collect(Collectors.toList());
+    }
+
     private Specification<Article> buildQuery(ArticleQueryParam queryParam) {
         Assert.notNull(queryParam, "文章查询参数不能为空");
 
@@ -149,7 +154,7 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
     @Override
     public Article updateStatus(ArticleStatus status, Long articleId) {
         Assert.notNull(status,"Article status must not be null");
-        Assert.isTrue(ServiceUtils.isEmptyId(articleId),"Article id must not be empty");
+        Assert.isTrue(!ServiceUtils.isEmptyId(articleId),"Article id must not be empty");
 
         Article article = getById(articleId);
 

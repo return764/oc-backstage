@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +35,7 @@ public interface ArticleDao extends BaseDao<Article,Long> {
 
     Page<Article> findAllByStatus(ArticleStatus status, Pageable pageable);
 
+    @Transactional
     @Modifying
     @Query("update Article a set a.status = :status where a.id = :id")
     int updateStatus(@Param("status") ArticleStatus status,@Param("id") Long id);

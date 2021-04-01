@@ -37,6 +37,8 @@ public interface ArticleService extends CrudService<Article,Long>, ConverterServ
 
     Page<ArticleSimpleVO> convertToSimplePage(Page<Article> articles);
 
+    List<ArticleSimpleVO> convertToSimpleList(List<Article> articles);
+
     ArticleDetailVO createBy(Article article);
 
     ArticleDetailVO updateBy(Article article);
