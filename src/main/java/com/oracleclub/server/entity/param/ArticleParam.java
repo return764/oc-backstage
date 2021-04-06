@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
  */
 @Data
 public class ArticleParam implements InputConverter<Article> {
+    private String author;
     private String title;
     private String description;
     private String content;

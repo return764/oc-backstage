@@ -52,11 +52,13 @@ public class Article extends BaseEntity implements Serializable {
      * 浏览数
      */
     @Column(name = "view_count")
+    @ColumnDefault("0")
     private Integer viewCount;
     /**
      * 点赞数
      */
     @Column(name = "like_count")
+    @ColumnDefault("0")
     private Integer likeCount;
     /**
      * 封面图片
@@ -65,5 +67,16 @@ public class Article extends BaseEntity implements Serializable {
     private String coverImage;
 
 
+    @Override
+    protected void prePersist() {
+        super.prePersist();
 
+        if (viewCount == null || viewCount < 0){
+            viewCount = 0;
+        }
+
+        if (likeCount == null || likeCount < 0){
+            likeCount = 0;
+        }
+    }
 }

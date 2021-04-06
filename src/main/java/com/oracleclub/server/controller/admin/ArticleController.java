@@ -34,9 +34,8 @@ public class ArticleController {
 
 
     @GetMapping("{id:\\d+}")
-    public R getBy(@PathVariable("id") Long id,
-                   @RequestParam(value = "status",required = false,defaultValue = "1") ArticleStatus status) {
-        Article article = articleService.getBy(status,id);
+    public R getBy(@PathVariable("id") Long id) {
+        Article article = articleService.getById(id);
         return R.success("成功获取文章",articleService.convertToVO(article));
     }
 

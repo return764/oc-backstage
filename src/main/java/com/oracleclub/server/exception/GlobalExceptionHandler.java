@@ -58,4 +58,9 @@ public class GlobalExceptionHandler {
     public R uploadSizeExceptionHandle(MaxUploadSizeExceededException e){
         return R.failed("上传文件大小超过限制");
     }
+
+    @ExceptionHandler(LoginException.class)
+    public R loginExceptionHandle(LoginException e){
+        return R.failed(e.getMessage());
+    }
 }
