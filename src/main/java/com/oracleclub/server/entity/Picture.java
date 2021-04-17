@@ -32,8 +32,8 @@ public class Picture extends BaseEntity implements Serializable {
     /**
      * 缩略图地址
      */
-    @Column(name = "path_mini")
-    private String pathMini;
+    @Column(name = "thumb_path")
+    private String thumbPath;
     /**
      * 图片描述
      */

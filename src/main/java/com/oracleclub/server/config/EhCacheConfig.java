@@ -30,6 +30,8 @@ public class EhCacheConfig {
 
     private final CacheManager cacheManager;
     private final CacheConfiguration<String,String> cacheConfiguration;
+    private final CacheConfiguration<String, String> tokenCacheConfiguration;
+    private final CacheConfiguration<String, String> refreshTokenCacheConfiguration;
 
     {
         /**
@@ -53,6 +55,20 @@ public class EhCacheConfig {
                 ))
                 .build();
 
+        tokenCacheConfiguration = CacheConfigurationBuilder
+                .newCacheConfigurationBuilder(String.class,String.class,build)
+                .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(
+                        Duration.of(30, ChronoUnit.MINUTES)
+                ))
+                .build();
+
+        refreshTokenCacheConfiguration = CacheConfigurationBuilder
+                .newCacheConfigurationBuilder(String.class,String.class,build)
+                .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(
+                        Duration.of(3, ChronoUnit.DAYS)
+                ))
+                .build();
+
         /**
          * 创建缓存管理器
          * 指定本地路径缓存位置
@@ -63,13 +79,14 @@ public class EhCacheConfig {
                 .newCacheManagerBuilder()
                 .with(CacheManagerBuilder.persistence("/temp"))
                 .withCache("defaultCache",cacheConfiguration)
-                .withCache("token",cacheConfiguration)
+                .withCache("token",tokenCacheConfiguration)
                 .withCache("verifyCode", CacheConfigurationBuilder
                         .newCacheConfigurationBuilder(String.class,String.class,build)
                         .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(
                                 Duration.of(30, ChronoUnit.MINUTES)
                         ))
                         .build())
+                .withCache("refreshTokenCache",refreshTokenCacheConfiguration)
                 .build(true);
 
     }
@@ -78,7 +95,7 @@ public class EhCacheConfig {
      * 获取token缓存
      */
     @Bean("tokenCache")
-    public Cache<String,String> tokenCache(){
+    public Cache<String, String> tokenCache(){
         return cacheManager.getCache("token",String.class,String.class);
     }
 
@@ -87,4 +104,8 @@ public class EhCacheConfig {
         return cacheManager.getCache("verifyCode",String.class,String.class);
     }
 
+    @Bean("refreshTokenCache")
+    public Cache<String,String> refreshTokenCache(){
+        return cacheManager.getCache("refreshTokenCache",String.class,String.class);
+    }
 }

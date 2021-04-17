@@ -4,6 +4,7 @@ import com.oracleclub.server.config.properties.AppProperties;
 import com.oracleclub.server.interceptor.TokenInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -32,26 +33,30 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**");
     }
 
-//    @Override
-//    public void addCorsMappings(CorsRegistry registry) {
-//        registry.addMapping("/**")
-//                .allowCredentials(true)
-//                .allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE")
-//                .allowedOrigins("*");
-//    }
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowCredentials(true)
+                .allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE")
+                .allowedOrigins("*");
+    }
 
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String workDir = FILE_PROTOCOL + appProperties.getWorkPath();
 
-        registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/admin/")
-                .addResourceLocations(workDir + "static/");
+//        registry.addResourceHandler("/**")
+//                .addResourceLocations("classpath:/admin/")
+//                .addResourceLocations(workDir + "static/");
 
         registry.addResourceHandler("/upload/**")
                 .setCacheControl(CacheControl.maxAge(7L, TimeUnit.DAYS))
                 .addResourceLocations(workDir + "upload/");
+
+        registry.addResourceHandler("/pictures/**")
+                .setCacheControl(CacheControl.maxAge(7L, TimeUnit.DAYS))
+                .addResourceLocations(workDir + "pictures/");
     }
 
 }

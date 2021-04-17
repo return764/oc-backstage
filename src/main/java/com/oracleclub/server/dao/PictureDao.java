@@ -5,6 +5,7 @@ import com.oracleclub.server.entity.Picture;
 import com.oracleclub.server.entity.enums.PictureStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -18,4 +19,7 @@ public interface PictureDao extends BaseDao<Picture,Long> {
     List<Picture> findAllByStatus(PictureStatus status);
 
     Page<Picture> findAllByStatus(PictureStatus status, Pageable pageable);
+
+    @Query("select distinct p.type from Picture p")
+    List<String> findAllTypes();
 }

@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
-import javax.naming.AuthenticationException;
-
 /**
  * 全局异常捕获
  * @author RETURN
@@ -62,5 +60,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(LoginException.class)
     public R loginExceptionHandle(LoginException e){
         return R.failed(e.getMessage());
+    }
+
+    @ExceptionHandler(TokenPastDateException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public R tokenPastException(TokenPastDateException e){
+        if (e.getIsRefreshToken()){
+            //refreshToken过期
+            return R.builder().result("refreshToken failed").msg(e.getMessage()).build();
+        }else {
+            //token过期
+            return R.builder().result("token failed").msg(e.getMessage()).build();
+        }
+
     }
 }

@@ -30,7 +30,11 @@ public class FileHandlers {
     }
 
     public UploadResult upload(MultipartFile file,AttachmentType attachmentType) {
-        return getSupportedType(attachmentType).upload(file);
+        return upload(file,attachmentType,false);
+    }
+
+    public UploadResult upload(MultipartFile file,AttachmentType attachmentType,boolean isPicture) {
+        return getSupportedType(attachmentType).upload(file,isPicture);
     }
 
     public void delete(Attachment attachment) {

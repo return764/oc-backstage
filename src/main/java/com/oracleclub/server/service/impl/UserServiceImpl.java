@@ -6,6 +6,7 @@ import com.oracleclub.server.entity.Department;
 import com.oracleclub.server.entity.User;
 import com.oracleclub.server.entity.enums.UserStatus;
 import com.oracleclub.server.entity.param.UserQueryParam;
+import com.oracleclub.server.entity.support.LoginToken;
 import com.oracleclub.server.entity.vo.AuthUserVO;
 import com.oracleclub.server.entity.vo.DepartmentVO;
 import com.oracleclub.server.entity.vo.UserVO;
@@ -49,6 +50,7 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
     private final UserDao userDao;
     private final Cache<String, String> verifyCodeCache;
     private final Cache<String, String> tokenCache;
+    private Cache<String,String> refreshTokenCache;
     private final JavaMailSender mailSender;
     @Value("${spring.mail.username}")
     String username;
@@ -58,12 +60,14 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
     protected UserServiceImpl(UserDao userDao,
                               JavaMailSender mailSender,
                               @Qualifier("verifyCode") Cache<String, String> verifyCodeCache,
+                              @Qualifier("refreshTokenCache") Cache<String, String> refreshTokenCache,
                               Cache<String, String> tokenCache) {
         super(userDao);
         this.userDao = userDao;
         this.mailSender = mailSender;
         this.verifyCodeCache = verifyCodeCache;
         this.tokenCache = tokenCache;
+        this.refreshTokenCache = refreshTokenCache;
     }
 
 
@@ -219,13 +223,13 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
 
     private AuthUserVO getAuthUser(User user) {
         AuthUserVO authUser = new AuthUserVO().convertFrom(user);
-        String token = tokenCache.get(String.valueOf(user.getId()));
-        if (null == token) {
-            token = JwtUtil.signUser(user.getId());
-        }
+        LoginToken loginToken = JwtUtil.signUser(user.getId());
+
         authUser.setDepartmentName(user.getDepartment().getName());
-        authUser.setToken(token);
-        tokenCache.put(String.valueOf(user.getId()), token);
+        authUser.setToken(loginToken);
+
+        tokenCache.put(String.valueOf(user.getId()), loginToken.getToken());
+        refreshTokenCache.put(String.valueOf(user.getId()), loginToken.getRefreshToken());
         return authUser;
     }
 

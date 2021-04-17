@@ -36,7 +36,7 @@ public interface FileHandler {
     }
 
     @NonNull
-    UploadResult upload(@NonNull MultipartFile file);
+    UploadResult upload(@NonNull MultipartFile file,boolean isPicture);
 
     void delete(String path);
 

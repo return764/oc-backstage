@@ -6,6 +6,7 @@ import com.oracleclub.server.converter.OutputConverter;
 import com.oracleclub.server.entity.User;
 import com.oracleclub.server.entity.enums.RoleEnum;
 import com.oracleclub.server.entity.enums.UserStatus;
+import com.oracleclub.server.entity.support.LoginToken;
 import lombok.Data;
 
 import java.util.Date;
@@ -35,5 +36,5 @@ public class AuthUserVO implements OutputConverter<AuthUserVO, User> {
     /**
      * token
      */
-    private String token;
+    private LoginToken token;
 }

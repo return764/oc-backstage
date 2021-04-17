@@ -2,17 +2,19 @@ package com.oracleclub.server.controller.admin;
 
 import com.oracleclub.server.entity.Picture;
 import com.oracleclub.server.entity.param.PictureParam;
-import com.oracleclub.server.entity.vo.PictureVo;
+import com.oracleclub.server.entity.param.PictureQueryParam;
+import com.oracleclub.server.entity.vo.PictureVO;
 import com.oracleclub.server.entity.vo.R;
 import com.oracleclub.server.service.PictureService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -23,16 +25,16 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("admin/pictures")
+@RequestMapping("api/admin/pictures")
 public class PictureController {
 
     @Resource
     private PictureService pictureService;
 
     @GetMapping
-    public R listPicture(@PageableDefault(sort = "id",direction = Sort.Direction.DESC) Pageable pageable){
-        Page<Picture> pictures = pictureService.listAll(pageable);
-        return R.success("获取图片列表成功",pictureService.convertToPageVO(pictures));
+    public R listPicture(@PageableDefault(sort = "id",direction = Sort.Direction.DESC) Pageable pageable,
+                         PictureQueryParam pictureQueryParam){
+        return R.success("获取图片列表成功",pictureService.pageByParam(pageable,pictureQueryParam));
     }
 
     @GetMapping("latest")
@@ -60,7 +62,7 @@ public class PictureController {
 
         pictureParam.update(picture);
 
-        PictureVo pictureVo = pictureService.updateBy(picture);
+        PictureVO pictureVo = pictureService.updateBy(picture);
         return R.success("更新图片成功",pictureVo);
     }
 
@@ -77,7 +79,23 @@ public class PictureController {
     }
 
     @PostMapping("upload")
-    public R uploadPicture(){
-        return R.success("上传图片成功");
+    public R uploadPicture(@RequestParam("file") MultipartFile file){
+        Picture p = pictureService.upload(file);
+        return R.success("上传图片成功",pictureService.convertToVO(p));
+    }
+
+    @PostMapping("uploads")
+    public R uploadsPicture(@RequestParam("files") MultipartFile[] files){
+        List<Picture> list = new LinkedList<>();
+        for (MultipartFile file : files) {
+             list.add(pictureService.upload(file));
+        }
+        return R.success("批量上传图片成功",pictureService.convertToListVO(list));
+    }
+
+    @GetMapping("type")
+    public R getPictureTypes(){
+        List<String> types = pictureService.getTypes();
+        return R.success("获取图片类型成功",types);
     }
 }
