@@ -74,4 +74,10 @@ public class GlobalExceptionHandler {
         }
 
     }
+
+
+    @ExceptionHandler(NotFoundException.class)
+    public R notFoundException(NotFoundException e){
+        return R.failed(e.getMessage());
+    }
 }

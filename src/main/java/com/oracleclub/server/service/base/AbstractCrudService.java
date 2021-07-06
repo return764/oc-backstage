@@ -2,6 +2,7 @@ package com.oracleclub.server.service.base;
 
 import com.oracleclub.server.dao.base.BaseDao;
 import com.oracleclub.server.entity.base.BaseEntity;
+import com.oracleclub.server.exception.NotFoundException;
 import com.oracleclub.server.utils.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -64,7 +65,7 @@ public abstract class AbstractCrudService<DOMAIN extends BaseEntity,ID> implemen
 
     @Override
     public DOMAIN getById(ID id) {
-        return fetchById(id).orElseThrow(() -> new RuntimeException(domainName+"was not found or has been deleted"));
+        return fetchById(id).orElseThrow(() -> new NotFoundException(domainName+" was not found or has been deleted"));
     }
 
     @Override

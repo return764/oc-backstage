@@ -58,4 +58,5 @@ public interface ArticleService extends CrudService<Article,Long>, ConverterServ
     void increaseVisit(Long articleId);
 
     void increaseLike(Long articleId);
+
 }

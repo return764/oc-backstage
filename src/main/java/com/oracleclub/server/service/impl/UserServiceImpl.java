@@ -193,7 +193,7 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
                 predicates.add(cb.lessThanOrEqualTo(root.get("loginAt").as(LocalDateTime.class),userParam.getLoginEnd()));
             }
 
-
+            
             return cq.where(predicates.toArray(new Predicate[0])).getRestriction();
         };
     }

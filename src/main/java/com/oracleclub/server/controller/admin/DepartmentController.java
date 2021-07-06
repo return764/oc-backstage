@@ -14,7 +14,7 @@ import javax.annotation.Resource;
  * @since 2021-02-21 17:11:56
  */
 @Slf4j
-@RestController
+@RestController("admin_department_controller")
 @RequestMapping("api/admin/departments")
 public class DepartmentController {
 

@@ -24,7 +24,7 @@ import java.util.List;
  * @since 2021-02-21 17:23:09
  */
 @Slf4j
-@RestController
+@RestController("admin_article_controller")
 @RequestMapping("api/admin/articles")
 public class ArticleController {
 
