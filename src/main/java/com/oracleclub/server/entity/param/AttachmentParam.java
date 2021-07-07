@@ -10,4 +10,5 @@ import lombok.Data;
 public class AttachmentParam {
     private String name;
     private String suffix;
+    private boolean deleted;
 }

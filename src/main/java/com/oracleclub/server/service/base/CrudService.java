@@ -82,4 +82,5 @@ public interface CrudService<DOMAIN,ID> {
 
     @Transactional
     void removeAll();
+
 }

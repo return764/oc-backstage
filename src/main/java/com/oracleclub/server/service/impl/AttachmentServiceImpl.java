@@ -87,9 +87,24 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
     @Override
     public Page<AttachmentVO> pageByParam(Pageable pageable, AttachmentParam attachmentParam) {
         Assert.notNull(pageable,"分页参数不能为空");
-
-        Page<Attachment> attachmentPage = attachmentDao.findAllWithExist(buildParam(attachmentParam), pageable);
+        Specification<Attachment> param = buildParam(attachmentParam);
+        Page<Attachment> attachmentPage = null;
+        if (attachmentParam.isDeleted()){
+            attachmentPage = attachmentDao.findAllWithNotExist(param, pageable);
+        }else {
+            attachmentPage = attachmentDao.findAllWithExist(param, pageable);
+        }
         return convertToPageVO(attachmentPage);
+    }
+
+    @Override
+    public List<Attachment> rollbackFromRemove(List<Long> ids) {
+        Assert.notNull(ids,"idList不能为空");
+        List<Attachment> attachments = attachmentDao.findAllById(ids);
+        attachments.forEach(attachment -> {
+            attachment.setDeletedAt(null);
+        });
+        return updateInBatch(attachments);
     }
 
     private Specification<Attachment> buildParam(AttachmentParam attachmentParam) {

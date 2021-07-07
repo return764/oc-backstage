@@ -30,7 +30,6 @@ public class AttachmentController {
     @GetMapping
     public R listAttachment(@PageableDefault(sort = "id",direction = Sort.Direction.DESC) Pageable pageable,
                             AttachmentParam attachmentParam){
-
         return R.success("获取附件列表成功",attachmentService.pageByParam(pageable, attachmentParam));
     }
 
@@ -55,6 +54,7 @@ public class AttachmentController {
     @DeleteMapping
     public R deleteAttachmentByIds(@RequestBody List<Long> ids,
                                    @RequestParam(name = "soft",required = false,defaultValue = "true") boolean soft){
+        log.debug("deleted ids:{},soft:{}",ids,soft);
         if (soft){
             ids.forEach(attachmentService::removeLogicById);
         }else {
@@ -74,6 +74,14 @@ public class AttachmentController {
 
         Attachment update = attachmentService.update(attachment);
         return R.success("成功修改附件名",attachmentService.convertToVO(update));
+    }
+
+    @PutMapping
+    public R rollbackAttachment(@RequestBody List<Long> ids){
+        log.debug("ids:{}",ids);
+
+        return R.success("成功从回收站还原附件",
+                attachmentService.convertToListVO(attachmentService.rollbackFromRemove(ids)));
     }
 
     @PostMapping("upload")

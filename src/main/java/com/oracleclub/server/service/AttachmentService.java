@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * @author :RETURN
  * @date :2021/2/28 0:31
@@ -19,4 +21,5 @@ public interface AttachmentService extends CrudService<Attachment,Long>,Converte
 
     Page<AttachmentVO> pageByParam(Pageable pageable, AttachmentParam attachmentParam);
 
+    List<Attachment> rollbackFromRemove(List<Long> ids);
 }

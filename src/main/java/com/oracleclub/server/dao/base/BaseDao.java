@@ -29,5 +29,9 @@ public interface BaseDao<DOMAIN,ID> extends JpaRepository<DOMAIN,ID>, JpaSpecifi
 
     Page<DOMAIN> findAllWithExist(Pageable pageable);
 
+    Page<DOMAIN> findAllWithNotExist(Pageable pageable);
+
     Page<DOMAIN> findAllWithExist(@NonNull Specification specification, Pageable pageable);
+
+    Page<DOMAIN> findAllWithNotExist(@NonNull Specification specification, Pageable pageable);
 }

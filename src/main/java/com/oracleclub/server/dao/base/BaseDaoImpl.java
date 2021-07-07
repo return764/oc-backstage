@@ -65,19 +65,30 @@ public class BaseDaoImpl<DOMAIN extends BaseEntity, ID> extends SimpleJpaReposit
 
     @Override
     public List<DOMAIN> findAllWithExist(){
-        return super.findAll(getDeletedAtQuery());
+        return super.findAll(getDeletedAtQuery(true));
     }
 
     @Override
     public Page<DOMAIN> findAllWithExist(Pageable pageable){
-        return super.findAll(getDeletedAtQuery(),pageable);
+        return super.findAll(getDeletedAtQuery(true),pageable);
+    }
+
+    @Override
+    public Page<DOMAIN> findAllWithNotExist(Pageable pageable){
+        return super.findAll(getDeletedAtQuery(false),pageable);
     }
 
     @Override
     public Page<DOMAIN> findAllWithExist(@NonNull Specification specification, Pageable pageable){
         Assert.notNull(specification,"specification is not be null");
 
-        return super.findAll(specification.and(getDeletedAtQuery()),pageable);
+        return super.findAll(specification.and(getDeletedAtQuery(true)),pageable);
+    }
+    @Override
+    public Page<DOMAIN> findAllWithNotExist(@NonNull Specification specification, Pageable pageable){
+        Assert.notNull(specification,"specification is not be null");
+
+        return super.findAll(getDeletedAtQuery(false),pageable);
     }
 
     private Specification<DOMAIN> getDeletedAtQueryWithId(ID id){
@@ -91,14 +102,15 @@ public class BaseDaoImpl<DOMAIN extends BaseEntity, ID> extends SimpleJpaReposit
         });
     }
 
-    private Specification<DOMAIN> getDeletedAtQuery(){
+    private Specification<DOMAIN> getDeletedAtQuery(boolean exist){
         return ((root, criteriaQuery, criteriaBuilder) -> {
             Predicate p = criteriaBuilder.conjunction();
-
-            p = criteriaBuilder.and(p,criteriaBuilder.isNull(root.get("deletedAt")));
-
+            if (exist){
+                p = criteriaBuilder.and(p,criteriaBuilder.isNull(root.get("deletedAt")));
+            }else {
+                p = criteriaBuilder.and(p,criteriaBuilder.isNotNull(root.get("deletedAt")));
+            }
             return criteriaQuery.where(p).getRestriction();
         });
     }
-
 }

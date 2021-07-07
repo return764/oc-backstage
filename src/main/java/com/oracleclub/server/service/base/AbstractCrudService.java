@@ -174,4 +174,7 @@ public abstract class AbstractCrudService<DOMAIN extends BaseEntity,ID> implemen
     public void removeAll() {
         baseDao.deleteAll();
     }
+
+
+
 }
