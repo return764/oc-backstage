@@ -59,6 +59,6 @@ public class DepartmentServiceImpl extends AbstractCrudService<Department,Long> 
 
     @Override
     public List<Department> listAllExist() {
-        return departmentDao.findAllWithExist();
+        return departmentDao.findAllExist();
     }
 }

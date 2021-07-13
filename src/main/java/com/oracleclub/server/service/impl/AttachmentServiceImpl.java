@@ -9,6 +9,7 @@ import com.oracleclub.server.entity.vo.AttachmentVO;
 import com.oracleclub.server.handler.file.FileHandlers;
 import com.oracleclub.server.service.AttachmentService;
 import com.oracleclub.server.service.base.AbstractCrudService;
+import com.oracleclub.server.utils.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -70,8 +71,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
         Attachment a = new Attachment();
         a.setName(upload.getFileName());
         a.setMediaType(upload.getMediaType().toString());
-        a.setKey(upload.getFilePath());
-        a.setPath(upload.getFilePath());
+        a.setKey(ServiceUtils.changeFileSeparatorToUrlSeparator(upload.getFilePath()));
+        a.setPath(ServiceUtils.changeFileSeparatorToUrlSeparator(upload.getFilePath()));
         a.setThumbPath(upload.getThumbPath());
         a.setHeight(upload.getHeight());
         a.setWidth(upload.getWidth());
@@ -90,21 +91,35 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
         Specification<Attachment> param = buildParam(attachmentParam);
         Page<Attachment> attachmentPage = null;
         if (attachmentParam.isDeleted()){
-            attachmentPage = attachmentDao.findAllWithNotExist(param, pageable);
+            attachmentPage = attachmentDao.findAll(param, pageable);
         }else {
-            attachmentPage = attachmentDao.findAllWithExist(param, pageable);
+            attachmentPage = attachmentDao.findAllExist(param, pageable);
         }
         return convertToPageVO(attachmentPage);
     }
 
     @Override
     public List<Attachment> rollbackFromRemove(List<Long> ids) {
-        Assert.notNull(ids,"idList不能为空");
+        Assert.notEmpty(ids,"idList不能为空");
         List<Attachment> attachments = attachmentDao.findAllById(ids);
         attachments.forEach(attachment -> {
             attachment.setDeletedAt(null);
         });
         return updateInBatch(attachments);
+    }
+
+    @Override
+    public List<Attachment> removeAttachments(List<Long> ids) {
+        Assert.notEmpty(ids,"idList不能为空");
+
+        return ids.stream().map(this::removeAttachment).collect(Collectors.toList());
+    }
+
+    @Override
+    public Attachment removeAttachment(Long id) {
+        Attachment attachment = removeById(id);
+        fileHandlers.delete(attachment);
+        return attachment;
     }
 
     private Specification<Attachment> buildParam(AttachmentParam attachmentParam) {
@@ -122,7 +137,6 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
                         cb.like(root.get("name").as(String.class),"%"+attachmentParam.getName().trim()+"%")
                 ));
             }
-            System.out.println(predicates.size());
             return cq.where(predicates.toArray(new Predicate[0])).getRestriction();
         };
     }

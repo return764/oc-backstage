@@ -25,7 +25,7 @@ public class DepartmentController {
 
     @GetMapping("{id:\\d+}")
     public R getOne(@PathVariable Long id) {
-        return R.success("获取部门成功",departmentService.convertToVO(departmentService.getById(id)));
+        return R.success("获取部门成功",departmentService.convertToVO(departmentService.getByIdExist(id)));
     }
 
     @GetMapping

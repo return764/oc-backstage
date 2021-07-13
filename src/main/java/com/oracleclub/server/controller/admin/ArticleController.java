@@ -35,7 +35,7 @@ public class ArticleController {
 
     @GetMapping("{id:\\d+}")
     public R getBy(@PathVariable("id") Long id) {
-        Article article = articleService.getById(id);
+        Article article = articleService.getByIdExist(id);
         return R.success("成功获取文章",articleService.convertToVO(article));
     }
 
@@ -85,7 +85,7 @@ public class ArticleController {
     @PutMapping("{id:\\d+}")
     public R updateArticle(@PathVariable("id")Long id,
                            @RequestBody ArticleParam articleParam){
-        Article article = articleService.getById(id);
+        Article article = articleService.getByIdExist(id);
 
         articleParam.update(article);
 

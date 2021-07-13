@@ -59,33 +59,33 @@ public class BaseDaoImpl<DOMAIN extends BaseEntity, ID> extends SimpleJpaReposit
     }
 
     @Override
-    public Optional<DOMAIN> findByIdWithExist(ID id) {
+    public Optional<DOMAIN> findByIdExist(ID id) {
         return findOne(getDeletedAtQueryWithId(id));
     }
 
     @Override
-    public List<DOMAIN> findAllWithExist(){
+    public List<DOMAIN> findAllExist(){
         return super.findAll(getDeletedAtQuery(true));
     }
 
     @Override
-    public Page<DOMAIN> findAllWithExist(Pageable pageable){
+    public Page<DOMAIN> findAllExist(Pageable pageable){
         return super.findAll(getDeletedAtQuery(true),pageable);
     }
 
     @Override
-    public Page<DOMAIN> findAllWithNotExist(Pageable pageable){
+    public Page<DOMAIN> findAll(Pageable pageable){
         return super.findAll(getDeletedAtQuery(false),pageable);
     }
 
     @Override
-    public Page<DOMAIN> findAllWithExist(@NonNull Specification specification, Pageable pageable){
+    public Page<DOMAIN> findAllExist(@NonNull Specification specification, Pageable pageable){
         Assert.notNull(specification,"specification is not be null");
 
         return super.findAll(specification.and(getDeletedAtQuery(true)),pageable);
     }
     @Override
-    public Page<DOMAIN> findAllWithNotExist(@NonNull Specification specification, Pageable pageable){
+    public Page<DOMAIN> findAll(@NonNull Specification specification, Pageable pageable){
         Assert.notNull(specification,"specification is not be null");
 
         return super.findAll(getDeletedAtQuery(false),pageable);

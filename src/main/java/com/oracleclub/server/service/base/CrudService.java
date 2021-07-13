@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author :RETURN
@@ -25,13 +24,16 @@ public interface CrudService<DOMAIN,ID> {
     List<DOMAIN> listAllByIds(@NonNull Collection<ID> ids);
 
     @NonNull
-    Optional<DOMAIN> fetchById(@NonNull ID id);
-
-    @NonNull
     DOMAIN getById(@NonNull ID id);
 
     @Nullable
     DOMAIN getByIdOfNullable(@NonNull ID id);
+
+    @NonNull
+    DOMAIN getByIdExist(@NonNull ID id);
+
+    @Nullable
+    DOMAIN getByIdOfNullableExist(@NonNull ID id);
 
     boolean existById(@NonNull ID id);
 

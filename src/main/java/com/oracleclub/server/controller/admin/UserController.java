@@ -61,7 +61,7 @@ public class UserController {
             @RequestBody UserUpdateParam userUpdateParam){
         log.debug("params:{}",userUpdateParam);
         log.debug("department:{}",userUpdateParam.getDepartment());
-        User user = userService.getById(id);
+        User user = userService.getByIdExist(id);
 
         userUpdateParam.update(user);
 

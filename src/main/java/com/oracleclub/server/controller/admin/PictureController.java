@@ -45,7 +45,7 @@ public class PictureController {
 
     @GetMapping("{id:\\d+}")
     public R getPicture(@PathVariable Long id){
-        Picture picture = pictureService.getById(id);
+        Picture picture = pictureService.getByIdExist(id);
         return R.success("获取图片成功",pictureService.convertToVO(picture));
     }
 
@@ -58,7 +58,7 @@ public class PictureController {
     @PutMapping("{id:\\d+}")
     public R updatePicture(@PathVariable Long id,
                            @RequestBody PictureParam pictureParam){
-        Picture picture = pictureService.getById(id);
+        Picture picture = pictureService.getByIdExist(id);
 
         pictureParam.update(picture);
 

@@ -23,15 +23,12 @@ public interface BaseDao<DOMAIN,ID> extends JpaRepository<DOMAIN,ID>, JpaSpecifi
 
     DOMAIN logicDelete(ID id);
 
-    Optional<DOMAIN> findByIdWithExist(ID id);
+    Optional<DOMAIN> findByIdExist(ID id);
 
-    List<DOMAIN> findAllWithExist();
+    List<DOMAIN> findAllExist();
 
-    Page<DOMAIN> findAllWithExist(Pageable pageable);
+    Page<DOMAIN> findAllExist(Pageable pageable);
 
-    Page<DOMAIN> findAllWithNotExist(Pageable pageable);
+    Page<DOMAIN> findAllExist(@NonNull Specification specification, Pageable pageable);
 
-    Page<DOMAIN> findAllWithExist(@NonNull Specification specification, Pageable pageable);
-
-    Page<DOMAIN> findAllWithNotExist(@NonNull Specification specification, Pageable pageable);
 }

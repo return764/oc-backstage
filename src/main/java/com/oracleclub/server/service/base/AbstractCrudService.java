@@ -56,21 +56,33 @@ public abstract class AbstractCrudService<DOMAIN extends BaseEntity,ID> implemen
         return CollectionUtils.isEmpty(ids) ? Collections.emptyList() : baseDao.findAllById(ids);
     }
 
-    @Override
-    public Optional<DOMAIN> fetchById(ID id) {
-        Assert.notNull(id, domainName + " id must not be null");
-        //todo 排除删除的查询
-        return baseDao.findByIdWithExist(id);
+    private Optional<DOMAIN> fetchById(ID id,boolean expand) {
+        Assert.notNull(id, domainName + "不能为空");
+        //todo 重大bug 分离此方法 总共分为 查询带deletedAt 和 不带deletedAt 此方法改为私有
+        if (expand){
+            return baseDao.findById(id);
+        }
+        return baseDao.findByIdExist(id);
     }
 
     @Override
     public DOMAIN getById(ID id) {
-        return fetchById(id).orElseThrow(() -> new NotFoundException(domainName+" was not found or has been deleted"));
+        return fetchById(id,true).orElseThrow(() -> new NotFoundException(domainName+"未找到或者已删除"));
     }
 
     @Override
     public DOMAIN getByIdOfNullable(ID id) {
-        return fetchById(id).orElse(null);
+        return fetchById(id,true).orElse(null);
+    }
+
+    @Override
+    public DOMAIN getByIdExist(ID id) {
+        return fetchById(id,false).orElseThrow(() -> new NotFoundException(domainName+"未找到或者已删除"));
+    }
+
+    @Override
+    public DOMAIN getByIdOfNullableExist(ID id) {
+        return fetchById(id,false).orElse(null);
     }
 
     @Override
@@ -131,7 +143,7 @@ public abstract class AbstractCrudService<DOMAIN extends BaseEntity,ID> implemen
 
     @Override
     public DOMAIN removeByIdOfNullable(ID id) {
-        return fetchById(id).map(domain -> {
+        return fetchById(id,true).map(domain -> {
             remove(domain);
             return domain;
         }).orElse(null);

@@ -87,7 +87,7 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
     public Page<Article> pageBy(ArticleQueryParam queryParam, Pageable pageable) {
         Assert.notNull(pageable, "Page info must not be null");
 
-        return articleDao.findAllWithExist(buildQuery(queryParam),pageable);
+        return articleDao.findAllExist(buildQuery(queryParam),pageable);
     }
 
     @Override

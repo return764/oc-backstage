@@ -111,7 +111,7 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
     public Page<PictureVO> pageByParam(Pageable pageable, PictureQueryParam pictureParam) {
         Assert.notNull(pageable,"分页参数不能为空");
 
-        Page<Picture> all = pictureDao.findAllWithExist(buildQuery(pictureParam), pageable);
+        Page<Picture> all = pictureDao.findAllExist(buildQuery(pictureParam), pageable);
         return convertToPageVO(all);
     }
 

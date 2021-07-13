@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author :RETURN
@@ -35,18 +36,18 @@ public class AttachmentController {
 
     @GetMapping("{id:\\d+}")
     public R getAttachmentDetails(@PathVariable Long id){
-        Attachment attachment = attachmentService.getById(id);
+        Attachment attachment = attachmentService.getByIdExist(id);
         return R.success("获取附件详情成功",attachmentService.convertToVO(attachment));
     }
 
     @DeleteMapping("{id:\\d+}")
     public R deleteAttachmentById(@PathVariable Long id,
                                   @RequestParam(name = "soft",required = false,defaultValue = "true") boolean soft){
-        Attachment attachment = new Attachment();
+        Attachment attachment;
         if (soft){
             attachment = attachmentService.removeLogicById(id);
         }else {
-            attachment = attachmentService.removeById(id);
+            attachment = attachmentService.removeAttachment(id);
         }
         return R.success("成功删除附件",attachmentService.convertToVO(attachment));
     }
@@ -55,12 +56,14 @@ public class AttachmentController {
     public R deleteAttachmentByIds(@RequestBody List<Long> ids,
                                    @RequestParam(name = "soft",required = false,defaultValue = "true") boolean soft){
         log.debug("deleted ids:{},soft:{}",ids,soft);
+        List<Attachment> attachments;
         if (soft){
-            ids.forEach(attachmentService::removeLogicById);
+            attachments = ids.stream().map(id ->
+                    attachmentService.removeLogicById(id)).collect(Collectors.toList());
         }else {
-            attachmentService.removeInBatch(ids);
+            attachments = attachmentService.removeAttachments(ids);
         }
-        return R.success("成功批量删除附件");
+        return R.success("成功批量删除附件",attachmentService.convertToListVO(attachments));
     }
 
     @PutMapping("{id:\\d+}")
@@ -68,7 +71,7 @@ public class AttachmentController {
             String name){
         log.debug("id:{},name:{}",id,name);
 
-        Attachment attachment = attachmentService.getById(id);
+        Attachment attachment = attachmentService.getByIdExist(id);
 
         attachment.setName(name);
 

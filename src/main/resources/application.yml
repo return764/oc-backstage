@@ -38,4 +38,6 @@ logging:
   file:
     path: ${user.home}/.oc/logs
 
-
+system:
+  setting:
+    file-location: ${user.home}/.oc

@@ -22,4 +22,8 @@ public interface AttachmentService extends CrudService<Attachment,Long>,Converte
     Page<AttachmentVO> pageByParam(Pageable pageable, AttachmentParam attachmentParam);
 
     List<Attachment> rollbackFromRemove(List<Long> ids);
+
+    List<Attachment> removeAttachments(List<Long> ids);
+
+    Attachment removeAttachment(Long id);
 }

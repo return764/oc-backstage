@@ -38,7 +38,7 @@ public class FileHandlers {
     }
 
     public void delete(Attachment attachment) {
-        Assert.notNull(attachment, "Attachment must not be null");
+        Assert.notNull(attachment, "附件不能为空");
         getSupportedType(attachment.getType())
                 .delete(attachment.getKey());
     }
@@ -55,7 +55,7 @@ public class FileHandlers {
         if(!CollectionUtils.isEmpty(fileHandlers)){
             for (FileHandler handler : fileHandlers) {
                 if (this.fileHandlers.containsKey(handler.getAttachmentType())){
-                    throw new RuntimeException("相同的Attachment类型必须唯一");
+                    throw new RuntimeException("相同的附件类型必须唯一");
                 }
                 this.fileHandlers.put(handler.getAttachmentType(),handler);
             }

@@ -42,7 +42,7 @@ public class ArticleController {
 
     @GetMapping("{id:\\d+}")
     public ArticleDetailVO getBy(@PathVariable("id") Long id){
-        Article article = articleService.getById(id);
+        Article article = articleService.getByIdExist(id);
         return articleService.convertToVO(article);
     }
 }

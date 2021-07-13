@@ -151,7 +151,7 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
     @Override
     public Page<UserVO> pageByParam(Pageable pageable, UserQueryParam userParam) {
         Assert.notNull(pageable,"分页参数不能为空");
-        Page<User> all = userDao.findAllWithExist(buildParam(userParam), pageable);
+        Page<User> all = userDao.findAllExist(buildParam(userParam), pageable);
         return convertToPageVO(all);
     }
 
@@ -193,7 +193,7 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
                 predicates.add(cb.lessThanOrEqualTo(root.get("loginAt").as(LocalDateTime.class),userParam.getLoginEnd()));
             }
 
-            
+
             return cq.where(predicates.toArray(new Predicate[0])).getRestriction();
         };
     }
