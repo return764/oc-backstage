@@ -2,8 +2,9 @@ package com.oracleclub.server.service.impl;
 
 import com.oracleclub.server.dao.AttachmentDao;
 import com.oracleclub.server.entity.Attachment;
-import com.oracleclub.server.entity.enums.AttachmentType;
+import com.oracleclub.server.entity.enums.UploadFileType;
 import com.oracleclub.server.entity.param.AttachmentParam;
+import com.oracleclub.server.entity.support.UploadFile;
 import com.oracleclub.server.entity.support.UploadResult;
 import com.oracleclub.server.entity.vo.AttachmentVO;
 import com.oracleclub.server.handler.file.FileHandlers;
@@ -66,19 +67,19 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
         Assert.notNull(file,"文件上传时不能为空");
         log.debug("开始上传文件... 类型:[{}]",file.getContentType());
 
-        UploadResult upload = fileHandlers.upload(file, AttachmentType.LOCAL);
+        UploadResult upload = fileHandlers.upload(file, UploadFileType.LOCAL);
 
         Attachment a = new Attachment();
         a.setName(upload.getFileName());
         a.setMediaType(upload.getMediaType().toString());
-        a.setKey(ServiceUtils.changeFileSeparatorToUrlSeparator(upload.getFilePath()));
+        a.setUploadKey(ServiceUtils.changeFileSeparatorToUrlSeparator(upload.getFilePath()));
         a.setPath(ServiceUtils.changeFileSeparatorToUrlSeparator(upload.getFilePath()));
         a.setThumbPath(upload.getThumbPath());
         a.setHeight(upload.getHeight());
         a.setWidth(upload.getWidth());
         a.setSize(upload.getSize());
         a.setSuffix(upload.getSuffix());
-        a.setType(AttachmentType.LOCAL);
+        a.setUploadType(UploadFileType.LOCAL);
 
         log.debug("正在创建附件: [{}]",a);
 
@@ -118,7 +119,7 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
     @Override
     public Attachment removeAttachment(Long id) {
         Attachment attachment = removeById(id);
-        fileHandlers.delete(attachment);
+        fileHandlers.delete(new UploadFile().convertFrom(attachment));
         return attachment;
     }
 

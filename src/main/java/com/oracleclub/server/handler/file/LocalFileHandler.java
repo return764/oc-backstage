@@ -3,7 +3,7 @@ package com.oracleclub.server.handler.file;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import com.oracleclub.server.config.properties.AppProperties;
-import com.oracleclub.server.entity.enums.AttachmentType;
+import com.oracleclub.server.entity.enums.UploadFileType;
 import com.oracleclub.server.entity.support.UploadResult;
 import com.oracleclub.server.exception.FileOperationException;
 import com.oracleclub.server.utils.ImageUtils;
@@ -66,6 +66,9 @@ public class LocalFileHandler implements FileHandler{
     public UploadResult upload(MultipartFile file,boolean isPicture) {
         Assert.notNull(file,"上传文件不能为空");
         String uploadDir;
+
+        //todo 图片上传时，没办法直接创建文件夹，建议修改FileHandler逻辑。改用策略模式来减少耦合
+
         if (!isPicture){
             Calendar current = Calendar.getInstance();
 
@@ -165,8 +168,8 @@ public class LocalFileHandler implements FileHandler{
     }
 
     @Override
-    public AttachmentType getAttachmentType() {
-        return AttachmentType.LOCAL;
+    public UploadFileType getUploadFileType() {
+        return UploadFileType.LOCAL;
     }
 
     private boolean generateThumbnail(BufferedImage originalImage, Path thumbPath, String extension) {
@@ -178,7 +181,6 @@ public class LocalFileHandler implements FileHandler{
         //创建缩略图
         try {
             Files.createFile(thumbPath);
-            // Convert to thumbnail and copy the thumbnail
             log.debug("正在生成缩略图: [{}]", thumbPath.toString());
             Thumbnails.of(originalImage).size(THUMB_WIDTH, THUMB_HEIGHT).keepAspectRatio(true).toFile(thumbPath.toFile());
             log.debug("生成缩略图成功,写入到[{}]", thumbPath.toString());
@@ -186,7 +188,6 @@ public class LocalFileHandler implements FileHandler{
         } catch (Throwable t) {
             log.warn("生成缩略图失败: " + thumbPath, t);
         } finally {
-            // Disposes of this graphics context and releases any system resources that it is using.
             originalImage.getGraphics().dispose();
         }
         return result;

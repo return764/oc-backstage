@@ -25,9 +25,13 @@ public interface PictureService extends CrudService<Picture,Long>, ConverterServ
 
     PictureVO updateBy(Picture picture);
 
-    Picture upload(MultipartFile file);
+    Picture upload(MultipartFile file,String type);
 
     List<String> getTypes();
 
     Page<PictureVO> pageByParam(Pageable pageable, PictureQueryParam pictureParam);
+
+    List<Picture> removePictures(List<Long> ids);
+
+    Picture removePicture(Long id);
 }

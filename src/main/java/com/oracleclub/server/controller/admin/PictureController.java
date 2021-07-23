@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * (Picture)表控制层
@@ -24,7 +25,7 @@ import java.util.List;
  * @since 2020-08-13 22:00:59
  */
 @Slf4j
-@RestController
+@RestController("admin_picture_controller")
 @RequestMapping("api/admin/pictures")
 public class PictureController {
 
@@ -78,17 +79,33 @@ public class PictureController {
         return R.success("删除图片成功",pictureService.convertToVO(picture));
     }
 
+    @DeleteMapping
+    public R deletePictureByIds(@RequestBody List<Long> ids,
+                                   @RequestParam(name = "soft",required = false,defaultValue = "true") boolean soft){
+        log.debug("deleted ids:{},soft:{}",ids,soft);
+        List<Picture> pictures;
+        if (soft){
+            pictures = ids.stream().map(id ->
+                    pictureService.removeLogicById(id)).collect(Collectors.toList());
+        }else {
+            pictures = pictureService.removePictures(ids);
+        }
+        return R.success("成功批量删除附件",pictureService.convertToListVO(pictures));
+    }
+
     @PostMapping("upload")
-    public R uploadPicture(@RequestParam("file") MultipartFile file){
-        Picture p = pictureService.upload(file);
+    public R uploadPicture(@RequestParam("file") MultipartFile file
+            ,@RequestParam(value = "type",defaultValue = "default",required = false) String type){
+        Picture p = pictureService.upload(file,type);
         return R.success("上传图片成功",pictureService.convertToVO(p));
     }
 
     @PostMapping("uploads")
-    public R uploadsPicture(@RequestParam("files") MultipartFile[] files){
+    public R uploadsPicture(@RequestParam("files") MultipartFile[] files
+            ,@RequestParam(value = "type",defaultValue = "default",required = false) String type){
         List<Picture> list = new LinkedList<>();
         for (MultipartFile file : files) {
-             list.add(pictureService.upload(file));
+             list.add(pictureService.upload(file, type));
         }
         return R.success("批量上传图片成功",pictureService.convertToListVO(list));
     }

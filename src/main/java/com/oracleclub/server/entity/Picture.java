@@ -1,6 +1,6 @@
 package com.oracleclub.server.entity;
 
-import com.oracleclub.server.entity.base.BaseEntity;
+import com.oracleclub.server.entity.base.BaseUploadFile;
 import com.oracleclub.server.entity.enums.PictureStatus;
 import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
@@ -19,7 +19,7 @@ import java.io.Serializable;
 @Data
 @Entity
 @Table(name = "pictures")
-public class Picture extends BaseEntity implements Serializable {
+public class Picture extends BaseUploadFile implements Serializable {
     @Column
     private String name;
     @Column(name = "file_name")

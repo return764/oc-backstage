@@ -1,10 +1,8 @@
 package com.oracleclub.server.entity;
 
-import com.oracleclub.server.entity.base.BaseEntity;
-import com.oracleclub.server.entity.enums.AttachmentType;
+import com.oracleclub.server.entity.base.BaseUploadFile;
 import lombok.Data;
 import lombok.ToString;
-import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,7 +17,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "attachments")
 @ToString(callSuper = true)
-public class Attachment extends BaseEntity implements Serializable {
+public class Attachment extends BaseUploadFile implements Serializable {
 
 
     @Column
@@ -27,9 +25,6 @@ public class Attachment extends BaseEntity implements Serializable {
 
     @Column
     private String path;
-
-    @Column(name = "`key`")
-    private String key;
 
     @Column(name = "thumb_path")
     private String thumbPath;
@@ -48,10 +43,6 @@ public class Attachment extends BaseEntity implements Serializable {
 
     @Column
     private Long size;
-
-    @Column
-    @ColumnDefault("0")
-    private AttachmentType type;
 
     @Override
     protected void prePersist() {

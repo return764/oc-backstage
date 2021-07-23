@@ -4,7 +4,7 @@ package com.oracleclub.server.entity.enums;
  * @author :RETURN
  * @date :2021/2/27 21:22
  */
-public enum AttachmentType implements ValueEnum<Integer> {
+public enum UploadFileType implements ValueEnum<Integer> {
     /**
      * 本地
      */
@@ -16,7 +16,7 @@ public enum AttachmentType implements ValueEnum<Integer> {
 
     private final Integer value;
 
-    AttachmentType(Integer value) {
+    UploadFileType(Integer value) {
         this.value = value;
     }
 

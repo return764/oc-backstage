@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.oracleclub.server.converter.OutputConverter;
 import com.oracleclub.server.entity.Attachment;
-import com.oracleclub.server.entity.enums.AttachmentType;
+import com.oracleclub.server.entity.enums.UploadFileType;
 import lombok.Data;
 
 import java.util.Date;
@@ -27,6 +27,6 @@ public class AttachmentVO implements OutputConverter<AttachmentVO, Attachment> {
     private Integer width;
     private Integer height;
     private Long size;
-    private AttachmentType type;
+    private UploadFileType type;
     private Date createdAt;
 }

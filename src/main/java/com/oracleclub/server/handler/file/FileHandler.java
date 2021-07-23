@@ -1,7 +1,7 @@
 package com.oracleclub.server.handler.file;
 
 import cn.hutool.core.util.StrUtil;
-import com.oracleclub.server.entity.enums.AttachmentType;
+import com.oracleclub.server.entity.enums.UploadFileType;
 import com.oracleclub.server.entity.support.AppConstant;
 import com.oracleclub.server.entity.support.UploadResult;
 import org.springframework.http.MediaType;
@@ -30,7 +30,7 @@ public interface FileHandler {
 
     @NonNull
     static String normalizeDirectory(@NonNull String dir){
-        Assert.hasText(dir,"Directory name must not be blank");
+        Assert.hasText(dir,"文件夹名不能为空");
         String normal = Paths.get(dir).normalize().toString();
         return StrUtil.appendIfMissing(normal, AppConstant.FILE_SEPARATOR);
     }
@@ -40,5 +40,5 @@ public interface FileHandler {
 
     void delete(String path);
 
-    AttachmentType getAttachmentType();
+    UploadFileType getUploadFileType();
 }

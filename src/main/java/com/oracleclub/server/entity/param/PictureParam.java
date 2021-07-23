@@ -17,5 +17,5 @@ public class PictureParam implements InputConverter<Picture> {
     private Integer height;
     private Integer width;
     private Integer suffix;
-
+    private String type;
 }

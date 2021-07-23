@@ -2,14 +2,16 @@ package com.oracleclub.server.service.impl;
 
 import com.oracleclub.server.dao.PictureDao;
 import com.oracleclub.server.entity.Picture;
-import com.oracleclub.server.entity.enums.AttachmentType;
 import com.oracleclub.server.entity.enums.PictureStatus;
+import com.oracleclub.server.entity.enums.UploadFileType;
 import com.oracleclub.server.entity.param.PictureQueryParam;
+import com.oracleclub.server.entity.support.UploadFile;
 import com.oracleclub.server.entity.support.UploadResult;
 import com.oracleclub.server.entity.vo.PictureVO;
 import com.oracleclub.server.handler.file.FileHandlers;
 import com.oracleclub.server.service.PictureService;
 import com.oracleclub.server.service.base.AbstractCrudService;
+import com.oracleclub.server.utils.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -84,20 +86,22 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
     }
 
     @Override
-    public Picture upload(MultipartFile file) {
+    public Picture upload(MultipartFile file,String type) {
         Assert.notNull(file,"上传图片不能为空");
-        UploadResult upload = fileHandlers.upload(file, AttachmentType.LOCAL,true);
+        UploadResult upload = fileHandlers.upload(file, UploadFileType.LOCAL,true);
 
         Picture picture = new Picture();
         picture.setHeight(upload.getHeight());
         picture.setWidth(upload.getWidth());
-        picture.setType("default");
+        picture.setType(type);
         picture.setSuffix(upload.getSuffix());
         picture.setSize(upload.getSize());
         picture.setMediaType(upload.getMediaType().toString());
-        picture.setPath(upload.getFilePath());
+        picture.setPath(ServiceUtils.changeFileSeparatorToUrlSeparator(upload.getFilePath()));
         picture.setThumbPath(upload.getThumbPath());
         picture.setStatus(PictureStatus.EXIST);
+        picture.setUploadType(UploadFileType.LOCAL);
+        picture.setUploadKey(upload.getFilePath());
 
         return create(picture);
     }
@@ -113,6 +117,21 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
 
         Page<Picture> all = pictureDao.findAllExist(buildQuery(pictureParam), pageable);
         return convertToPageVO(all);
+    }
+
+    @Override
+    public List<Picture> removePictures(List<Long> ids) {
+        Assert.notEmpty(ids,"idList不能为空");
+
+        return ids.stream().map(this::removePicture).collect(Collectors.toList());
+    }
+
+    @Override
+    public Picture removePicture(Long id) {
+        Picture picture = removeById(id);
+        fileHandlers.delete(new UploadFile().convertFrom(picture));
+
+        return picture;
     }
 
     private Specification<Picture> buildQuery(PictureQueryParam pictureParam) {
