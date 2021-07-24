@@ -21,11 +21,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Calendar;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static com.oracleclub.server.entity.support.AppConstant.FILE_SEPARATOR;
 
 /**
  * @author :RETURN
@@ -35,8 +32,6 @@ import static com.oracleclub.server.entity.support.AppConstant.FILE_SEPARATOR;
 @Component
 public class LocalFileHandler implements FileHandler{
 
-    private final static String UPLOAD_DIR = "upload/";
-    private final static String PICTURE_DIR = "pictures/";
 
     private final static String THUMBNAIL_SUFFIX = "-thumbnail";
 
@@ -63,24 +58,9 @@ public class LocalFileHandler implements FileHandler{
     }
 
     @Override
-    public UploadResult upload(MultipartFile file,boolean isPicture) {
+    public UploadResult upload(MultipartFile file, String uploadDir) {
         Assert.notNull(file,"上传文件不能为空");
-        String uploadDir;
-
-        //todo 图片上传时，没办法直接创建文件夹，建议修改FileHandler逻辑。改用策略模式来减少耦合
-
-        if (!isPicture){
-            Calendar current = Calendar.getInstance();
-
-            int year = current.get(Calendar.YEAR);
-            int month = current.get(Calendar.MONTH);
-
-            String monthStr = month > 10 ? String.valueOf(month) : "0"+month;
-
-            uploadDir = UPLOAD_DIR + year + FILE_SEPARATOR + monthStr + FILE_SEPARATOR;
-        }else {
-            uploadDir = PICTURE_DIR + "default" + FILE_SEPARATOR;
-        }
+        Assert.hasText(uploadDir,"上传路径不能为空");
 
         String orgBasename = FileUtil.mainName(Objects.requireNonNull(file.getOriginalFilename()));
         String ext = FileUtil.extName(file.getOriginalFilename());

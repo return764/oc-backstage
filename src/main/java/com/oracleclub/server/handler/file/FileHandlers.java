@@ -29,12 +29,8 @@ public class FileHandlers {
         log.info("注册{}个文件处理器",fileHandlers.size());
     }
 
-    public UploadResult upload(MultipartFile file, UploadFileType uploadFileType) {
-        return upload(file,uploadFileType,false);
-    }
-
-    public UploadResult upload(MultipartFile file, UploadFileType uploadFileType, boolean isPicture) {
-        return getSupportedType(uploadFileType).upload(file,isPicture);
+    public UploadResult upload(MultipartFile file, UploadFileType uploadFileType, String uploadDir) {
+        return getSupportedType(uploadFileType).upload(file,uploadDir);
     }
 
     public void delete(UploadFile uploadFile) {

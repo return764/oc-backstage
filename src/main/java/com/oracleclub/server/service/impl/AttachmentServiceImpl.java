@@ -8,6 +8,7 @@ import com.oracleclub.server.entity.support.UploadFile;
 import com.oracleclub.server.entity.support.UploadResult;
 import com.oracleclub.server.entity.vo.AttachmentVO;
 import com.oracleclub.server.handler.file.FileHandlers;
+import com.oracleclub.server.handler.file.support.AttachmentUpload;
 import com.oracleclub.server.service.AttachmentService;
 import com.oracleclub.server.service.base.AbstractCrudService;
 import com.oracleclub.server.utils.ServiceUtils;
@@ -34,11 +35,13 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
 
     private final AttachmentDao attachmentDao;
     private final FileHandlers fileHandlers;
+    private final AttachmentUpload attachmentUpload;
 
-    public AttachmentServiceImpl(AttachmentDao attachmentDao,FileHandlers fileHandlers) {
+    public AttachmentServiceImpl(AttachmentDao attachmentDao,FileHandlers fileHandlers, AttachmentUpload attachmentUpload) {
         super(attachmentDao);
         this.attachmentDao = attachmentDao;
         this.fileHandlers = fileHandlers;
+        this.attachmentUpload = attachmentUpload;
     }
 
     @Override
@@ -67,7 +70,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
         Assert.notNull(file,"文件上传时不能为空");
         log.debug("开始上传文件... 类型:[{}]",file.getContentType());
 
-        UploadResult upload = fileHandlers.upload(file, UploadFileType.LOCAL);
+        String uploadDir = attachmentUpload.createUploadPath();
+        UploadResult upload = fileHandlers.upload(file, UploadFileType.LOCAL,uploadDir);
 
         Attachment a = new Attachment();
         a.setName(upload.getFileName());

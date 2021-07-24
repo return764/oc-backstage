@@ -9,6 +9,7 @@ import com.oracleclub.server.entity.support.UploadFile;
 import com.oracleclub.server.entity.support.UploadResult;
 import com.oracleclub.server.entity.vo.PictureVO;
 import com.oracleclub.server.handler.file.FileHandlers;
+import com.oracleclub.server.handler.file.support.PictureUpload;
 import com.oracleclub.server.service.PictureService;
 import com.oracleclub.server.service.base.AbstractCrudService;
 import com.oracleclub.server.utils.ServiceUtils;
@@ -39,11 +40,13 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
 
     private final PictureDao pictureDao;
     private final FileHandlers fileHandlers;
+    private final PictureUpload pictureUpload;
 
-    protected PictureServiceImpl(PictureDao pictureDao,FileHandlers fileHandlers) {
+    protected PictureServiceImpl(PictureDao pictureDao,FileHandlers fileHandlers, PictureUpload pictureUpload) {
         super(pictureDao);
         this.pictureDao = pictureDao;
         this.fileHandlers = fileHandlers;
+        this.pictureUpload = pictureUpload;
     }
 
     @Override
@@ -88,12 +91,14 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
     @Override
     public Picture upload(MultipartFile file,String type) {
         Assert.notNull(file,"上传图片不能为空");
-        UploadResult upload = fileHandlers.upload(file, UploadFileType.LOCAL,true);
-
         Picture picture = new Picture();
+        picture.setType(type);
+
+        String uploadDir = pictureUpload.createUploadPath(picture);
+        UploadResult upload = fileHandlers.upload(file, UploadFileType.LOCAL,uploadDir);
+
         picture.setHeight(upload.getHeight());
         picture.setWidth(upload.getWidth());
-        picture.setType(type);
         picture.setSuffix(upload.getSuffix());
         picture.setSize(upload.getSize());
         picture.setMediaType(upload.getMediaType().toString());
