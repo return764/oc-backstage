@@ -8,7 +8,7 @@ import java.io.File;
  */
 public class AppConstant {
 
-    public final static String BASE_DIR = ".oc";
+    public final static String BASE_DIR = "oc";
 
     public final static String USER_HOME = System.getProperties().getProperty("user.home");
 

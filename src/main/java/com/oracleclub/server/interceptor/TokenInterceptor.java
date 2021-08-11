@@ -8,6 +8,7 @@ import com.oracleclub.server.exception.TokenPastDateException;
 import com.oracleclub.server.utils.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ehcache.Cache;
+import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -42,9 +43,9 @@ public class TokenInterceptor implements HandlerInterceptor {
         }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
 
-//        if(handlerMethod.getBeanType() == BasicErrorController.class){
-//            throw new RuntimeException("未知错误");
-//        }
+        if(handlerMethod.getBeanType() == BasicErrorController.class){
+            throw new RuntimeException("未知错误");
+        }
         //如果有不需要验证token的注解
         if (handlerMethod.hasMethodAnnotation(PassToken.class)){
             return true;

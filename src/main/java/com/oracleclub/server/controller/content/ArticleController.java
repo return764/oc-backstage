@@ -1,6 +1,8 @@
 package com.oracleclub.server.controller.content;
 
 import com.oracleclub.server.entity.Article;
+import com.oracleclub.server.entity.enums.ArticleStatus;
+import com.oracleclub.server.entity.param.ArticleQueryParam;
 import com.oracleclub.server.entity.vo.ArticleDetailVO;
 import com.oracleclub.server.entity.vo.ArticleSimpleVO;
 import com.oracleclub.server.service.ArticleService;
@@ -36,7 +38,10 @@ public class ArticleController {
 
     @GetMapping
     public Page<ArticleSimpleVO> pageBy(@PageableDefault(sort = "id",direction = Sort.Direction.DESC) Pageable pageable){
-        Page<Article> articles = articleService.pageBy(pageable);
+        ArticleQueryParam params = new ArticleQueryParam();
+        params.setStatus(ArticleStatus.PUBLISHED);
+
+        Page<Article> articles = articleService.pageBy(params,pageable);
         return articleService.convertToSimplePage(articles);
     }
 

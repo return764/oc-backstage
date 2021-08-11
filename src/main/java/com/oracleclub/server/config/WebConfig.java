@@ -2,6 +2,7 @@ package com.oracleclub.server.config;
 
 import com.oracleclub.server.config.properties.AppProperties;
 import com.oracleclub.server.interceptor.TokenInterceptor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -19,6 +20,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2020/8/14 0:42
  */
 @Configuration
+@Slf4j
 public class WebConfig implements WebMvcConfigurer {
 
     private static final String FILE_PROTOCOL = "file:///";
@@ -31,6 +33,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(tokenInterceptor)
                 .addPathPatterns("/**")
+                .excludePathPatterns("/upload/**")
+                .excludePathPatterns("/pictures/**")
                 .excludePathPatterns("/api/content/**");
     }
 
@@ -50,6 +54,7 @@ public class WebConfig implements WebMvcConfigurer {
 //        registry.addResourceHandler("/**")
 //                .addResourceLocations("classpath:/admin/")
 //                .addResourceLocations(workDir + "static/");
+        log.debug("工作目录:"+workDir);
 
         registry.addResourceHandler("/upload/**")
                 .setCacheControl(CacheControl.maxAge(7L, TimeUnit.DAYS))

@@ -36,8 +36,8 @@ logging:
   level:
     com.oracleclub.server: DEBUG
   file:
-    path: ${user.home}/.oc/logs
+    path: ${user.home}/oc/logs
 
 system:
   setting:
-    file-location: ${user.home}/.oc
+    file-location: ${user.home}/oc
