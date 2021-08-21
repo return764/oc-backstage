@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author :RETURN
@@ -32,8 +33,12 @@ public class ArticleController {
 
     @GetMapping("latest")
     public ArticleDetailVO latest(){
-        //todo this latest include createdAt and updatedAt ,
        return articleService.convertToVO(articleService.listLatest(1).get(0));
+    }
+
+    @GetMapping("top/{num:\\d+}")
+    public List<ArticleSimpleVO> top(@PathVariable Integer num){
+        return articleService.convertToSimpleList(articleService.listLatest(num));
     }
 
     @GetMapping
@@ -47,7 +52,10 @@ public class ArticleController {
 
     @GetMapping("{id:\\d+}")
     public ArticleDetailVO getBy(@PathVariable("id") Long id){
+        //在这里增加访问次数
+        articleService.increaseVisit(id);
         Article article = articleService.getByIdExist(id);
+
         return articleService.convertToVO(article);
     }
 }

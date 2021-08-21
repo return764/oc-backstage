@@ -51,9 +51,9 @@ public interface ArticleService extends CrudService<Article,Long>, ConverterServ
 
     ArticleDetailVO createOrUpdateBy(Article article);
 
-    void increaseVisit(long visits,Long articleId);
+    void increaseVisit(int visits,Long articleId);
 
-    void increaseLike(long likes,Long articleId);
+    void increaseLike(int likes,Long articleId);
 
     void increaseVisit(Long articleId);
 

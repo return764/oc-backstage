@@ -21,13 +21,15 @@ import java.util.Optional;
  * @since 2021-02-21 17:23:09
  */
 public interface ArticleDao extends BaseDao<Article,Long> {
+    @Transactional
     @Modifying
     @Query("update Article a set a.likeCount = a.likeCount + :likes where a.id = :articleId")
-    int updateLikes(@Param("likes") long likes, @Param("articleId") @NonNull Long articleId);
+    int updateLikes(@Param("likes") int likes, @Param("articleId") @NonNull Long articleId);
 
+    @Transactional
     @Modifying
     @Query("update Article a set a.viewCount = a.viewCount + :visits where a.id = :articleId")
-    int updateVisits(@Param("visits") long visits, @Param("articleId") @NonNull Long articleId);
+    int updateVisits(@Param("visits") int visits, @Param("articleId") @NonNull Long articleId);
 
     Optional<Article> findByIdAndStatus(Long id, ArticleStatus status);
 

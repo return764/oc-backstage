@@ -213,7 +213,7 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
     }
 
     @Override
-    public void increaseVisit(long visits, Long articleId) {
+    public void increaseVisit(int visits, Long articleId) {
         Assert.isTrue(visits > 0,"visits to increase must be less than 1");
         Assert.notNull(articleId,"article id is must not be null");
 
@@ -226,7 +226,7 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
     }
 
     @Override
-    public void increaseLike(long likes, Long articleId) {
+    public void increaseLike(int likes, Long articleId) {
         Assert.isTrue(likes > 0,"visits to increase must be less than 1");
         Assert.notNull(articleId,"article id is must not be null");
 
