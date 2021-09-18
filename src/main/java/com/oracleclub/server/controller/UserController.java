@@ -2,16 +2,14 @@ package com.oracleclub.server.controller;
 
 import com.oracleclub.server.annotation.PassToken;
 import com.oracleclub.server.entity.param.LoginParam;
+import com.oracleclub.server.entity.param.RegisterParam;
 import com.oracleclub.server.entity.vo.AuthUserVO;
 import com.oracleclub.server.entity.vo.R;
 import com.oracleclub.server.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.ehcache.Cache;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -22,7 +20,7 @@ import javax.validation.Valid;
  * @author RETURN
  * @since 2020-08-13 22:01:00
  */
-@RestController
+@RestController("comm_user_controller")
 @Slf4j
 @RequestMapping("api/users")
 public class UserController {
@@ -41,7 +39,6 @@ public class UserController {
         verifyCodeCache.put(email, verifyCode);
         log.debug("验证码 -> {}", verifyCode);
         userService.sendVerifyCode(email, "您的验证码", verifyCode);
-
         return R.builder().result("ok").msg("验证码发送成功").build();
     }
 
@@ -86,4 +83,11 @@ public class UserController {
     }
 
 
+    @PassToken
+    @PostMapping("register")
+    public R register(@RequestBody RegisterParam registerParam){
+        log.debug(registerParam.toString());
+        AuthUserVO register = userService.register(registerParam);
+        return R.success("注册成功",register);
+    }
 }

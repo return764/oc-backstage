@@ -2,15 +2,14 @@ package com.oracleclub.server.dao;
 
 import com.oracleclub.server.dao.base.BaseDao;
 import com.oracleclub.server.entity.Article;
+import com.oracleclub.server.entity.enums.ArticleStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.oracleclub.server.entity.enums.ArticleStatus;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,12 +20,10 @@ import java.util.Optional;
  * @since 2021-02-21 17:23:09
  */
 public interface ArticleDao extends BaseDao<Article,Long> {
-    @Transactional
     @Modifying
     @Query("update Article a set a.likeCount = a.likeCount + :likes where a.id = :articleId")
     int updateLikes(@Param("likes") int likes, @Param("articleId") @NonNull Long articleId);
 
-    @Transactional
     @Modifying
     @Query("update Article a set a.viewCount = a.viewCount + :visits where a.id = :articleId")
     int updateVisits(@Param("visits") int visits, @Param("articleId") @NonNull Long articleId);
@@ -37,7 +34,6 @@ public interface ArticleDao extends BaseDao<Article,Long> {
 
     Page<Article> findAllByStatus(ArticleStatus status, Pageable pageable);
 
-    @Transactional
     @Modifying
     @Query("update Article a set a.status = :status where a.id = :id")
     int updateStatus(@Param("status") ArticleStatus status,@Param("id") Long id);

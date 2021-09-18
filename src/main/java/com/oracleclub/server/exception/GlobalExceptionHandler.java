@@ -41,7 +41,6 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public R userExceptionHandle(Exception e){
         return R.failed(e.getMessage());
     }

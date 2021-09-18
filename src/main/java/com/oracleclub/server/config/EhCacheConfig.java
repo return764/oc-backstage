@@ -1,5 +1,6 @@
 package com.oracleclub.server.config;
 
+import com.oracleclub.server.config.properties.AppProperties;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.CacheConfiguration;
@@ -12,6 +13,7 @@ import org.ehcache.config.units.EntryUnit;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
@@ -28,17 +30,21 @@ import java.time.temporal.ChronoUnit;
 @Configuration
 public class EhCacheConfig {
 
-    private final CacheManager cacheManager;
+    @Resource
+    private AppProperties appProperties;
+
+    private CacheManager cacheManager;
     private final CacheConfiguration<String,String> cacheConfiguration;
     private final CacheConfiguration<String, String> tokenCacheConfiguration;
     private final CacheConfiguration<String, String> refreshTokenCacheConfiguration;
+    private final ResourcePools build;
 
     {
         /**
          * 配置资源池
          * heap表示堆内 offheap表示堆外内存 disk表示硬盘
          */
-        ResourcePools build = ResourcePoolsBuilder.newResourcePoolsBuilder()
+        build = ResourcePoolsBuilder.newResourcePoolsBuilder()
                 .heap(2000L, EntryUnit.ENTRIES)
 //                .offheap(20L, MemoryUnit.MB)
 //                .disk(500L, MemoryUnit.MB, true)
@@ -68,16 +74,18 @@ public class EhCacheConfig {
                         Duration.of(3, ChronoUnit.DAYS)
                 ))
                 .build();
+    }
 
-        /**
-         * 创建缓存管理器
-         * 指定本地路径缓存位置
-         * 创建defaultCache和token缓存
-         * 初始化
-         */
+    /**
+     * 创建缓存管理器
+     * 指定本地路径缓存位置
+     * 创建defaultCache和token缓存
+     * 初始化
+     */
+    private void initCacheManager(){
         cacheManager = CacheManagerBuilder
                 .newCacheManagerBuilder()
-                .with(CacheManagerBuilder.persistence("/temp"))
+                .with(CacheManagerBuilder.persistence(appProperties.getWorkPath()+"/temp"))
                 .withCache("defaultCache",cacheConfiguration)
                 .withCache("token",tokenCacheConfiguration)
                 .withCache("verifyCode", CacheConfigurationBuilder
@@ -88,7 +96,6 @@ public class EhCacheConfig {
                         .build())
                 .withCache("refreshTokenCache",refreshTokenCacheConfiguration)
                 .build(true);
-
     }
 
     /**
@@ -96,16 +103,25 @@ public class EhCacheConfig {
      */
     @Bean("tokenCache")
     public Cache<String, String> tokenCache(){
+        if (cacheManager == null){
+            initCacheManager();
+        }
         return cacheManager.getCache("token",String.class,String.class);
     }
 
     @Bean("verifyCode")
     public Cache<String,String> verifyCode(){
+        if (cacheManager == null){
+            initCacheManager();
+        }
         return cacheManager.getCache("verifyCode",String.class,String.class);
     }
 
     @Bean("refreshTokenCache")
     public Cache<String,String> refreshTokenCache(){
+        if (cacheManager == null){
+            initCacheManager();
+        }
         return cacheManager.getCache("refreshTokenCache",String.class,String.class);
     }
 }

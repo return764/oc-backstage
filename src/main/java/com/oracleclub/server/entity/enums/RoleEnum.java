@@ -8,7 +8,8 @@ public enum RoleEnum implements ValueEnum<Integer> {
 
     VISITOR(0),
     NORMAL(1),
-    ADMIN(2);
+    ADMIN(2),
+    SUPER_ADMIN(3);
 
 
     private final int value;

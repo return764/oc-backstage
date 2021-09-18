@@ -71,7 +71,7 @@ public class TokenInterceptor implements HandlerInterceptor {
         log.debug("token:{}",token);
 
         //缓存中存在，并且与传递过来的token不相同
-        if (cacheToken != null &&!token.equals(cacheToken)){
+        if (null != cacheToken &&!token.equals(cacheToken)){
             throw new AuthenticationException("token不匹配");
         }
 

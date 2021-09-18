@@ -1,6 +1,7 @@
 package com.oracleclub.server.service;
 
 import com.oracleclub.server.entity.User;
+import com.oracleclub.server.entity.param.RegisterParam;
 import com.oracleclub.server.entity.param.UserQueryParam;
 import com.oracleclub.server.entity.vo.AuthUserVO;
 import com.oracleclub.server.entity.vo.UserVO;
@@ -74,4 +75,5 @@ public interface UserService extends CrudService<User,Long>, ConverterService<Us
 
     Page<UserVO> pageByParam(Pageable pageable, UserQueryParam userParam);
 
+    AuthUserVO register(RegisterParam registerParam);
 }

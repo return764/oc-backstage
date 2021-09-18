@@ -4,13 +4,16 @@ import cn.hutool.crypto.digest.DigestUtil;
 import com.oracleclub.server.dao.UserDao;
 import com.oracleclub.server.entity.Department;
 import com.oracleclub.server.entity.User;
+import com.oracleclub.server.entity.enums.RoleEnum;
 import com.oracleclub.server.entity.enums.UserStatus;
+import com.oracleclub.server.entity.param.RegisterParam;
 import com.oracleclub.server.entity.param.UserQueryParam;
 import com.oracleclub.server.entity.support.LoginToken;
 import com.oracleclub.server.entity.vo.AuthUserVO;
 import com.oracleclub.server.entity.vo.DepartmentVO;
 import com.oracleclub.server.entity.vo.UserVO;
 import com.oracleclub.server.exception.LoginException;
+import com.oracleclub.server.exception.UserException;
 import com.oracleclub.server.exception.VerifyCodeException;
 import com.oracleclub.server.service.UserService;
 import com.oracleclub.server.service.base.AbstractCrudService;
@@ -124,10 +127,13 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
     public AuthUserVO loginEmail(String email, String password) {
         User u = userDao.findByEmail(email);
         log.debug("当前登录用户:[{}]",u);
+        if(u == null){
+            throw new LoginException("账号或密码错误");
+        }
         if(checkPassword(u,password)){
             return getAuthUser(u);
         }
-        throw new LoginException("密码错误");
+        throw new LoginException("账号或密码错误");
     }
 
     @Override
@@ -143,7 +149,6 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
 
     @Override
     public boolean checkPassword(User user,String password) {
-        Assert.notNull(user,"User must not be null");
         String pwd = user.getPassword();
         return DigestUtil.md5Hex(password).equals(pwd);
     }
@@ -153,6 +158,30 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         Assert.notNull(pageable,"分页参数不能为空");
         Page<User> all = userDao.findAllExist(buildParam(userParam), pageable);
         return convertToPageVO(all);
+    }
+
+    @Override
+    public AuthUserVO register(RegisterParam registerParam) {
+        Assert.notNull(registerParam,"参数不能为空");
+        User user = registerParam.convertTo();
+        user.setRole(RoleEnum.VISITOR);
+        user.setStatus(UserStatus.ACTIVE);
+        //检查是否存在学号
+        if(user.getStuNum() != null){
+            User test = userDao.findByStuNum(user.getStuNum());
+            if (test!=null){
+                throw new UserException("学号已存在");
+            }
+        }
+        //检查是否存在邮箱
+        if(user.getEmail() != null){
+            User test = userDao.findByEmail(user.getEmail());
+            if (test!=null){
+                throw new UserException("邮箱已存在");
+            }
+        }
+        User u = userDao.save(user);
+        return getAuthUser(u);
     }
 
     private static Specification<User> buildParam(UserQueryParam userParam){
@@ -203,7 +232,6 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         Assert.notNull(user,"用户不存在");
 
         UserVO userVO = new UserVO().convertFrom(user);
-
         Department department = user.getDepartment();
         if (department != null){
             userVO.setDepartment(new DepartmentVO().convertFrom(department));
@@ -225,7 +253,9 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         AuthUserVO authUser = new AuthUserVO().convertFrom(user);
         LoginToken loginToken = JwtUtil.signUser(user.getId());
 
-        authUser.setDepartmentName(user.getDepartment().getName());
+        if (user.getDepartment() != null){
+            authUser.setDepartmentName(user.getDepartment().getName());
+        }
         authUser.setToken(loginToken);
 
         tokenCache.put(String.valueOf(user.getId()), loginToken.getToken());
