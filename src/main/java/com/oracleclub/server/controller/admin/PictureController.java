@@ -1,15 +1,14 @@
 package com.oracleclub.server.controller.admin;
 
 import com.oracleclub.server.entity.Picture;
+import com.oracleclub.server.entity.param.PageRequest;
 import com.oracleclub.server.entity.param.PictureParam;
 import com.oracleclub.server.entity.param.PictureQueryParam;
 import com.oracleclub.server.entity.vo.PictureVO;
 import com.oracleclub.server.entity.vo.R;
+import com.oracleclub.server.handler.page.PageDefault;
 import com.oracleclub.server.service.PictureService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,10 +31,11 @@ public class PictureController {
     @Resource
     private PictureService pictureService;
 
+    // todo page参数不能转换
     @GetMapping
-    public R listPicture(@PageableDefault(sort = "id",direction = Sort.Direction.DESC) Pageable pageable,
+    public R listPicture(@PageDefault PageRequest pageable,
                          PictureQueryParam pictureQueryParam){
-        return R.success("获取图片列表成功",pictureService.pageByParam(pageable,pictureQueryParam));
+        return R.success("获取图片列表成功",pictureService.pageBy(pageable.convertTo(),pictureQueryParam));
     }
 
     @GetMapping("latest")
@@ -107,6 +107,7 @@ public class PictureController {
         for (MultipartFile file : files) {
              list.add(pictureService.upload(file, type));
         }
+        log.debug("{}",list);
         return R.success("批量上传图片成功",pictureService.convertToListVO(list));
     }
 

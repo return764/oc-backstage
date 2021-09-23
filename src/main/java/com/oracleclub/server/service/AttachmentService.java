@@ -1,12 +1,11 @@
 package com.oracleclub.server.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oracleclub.server.entity.Attachment;
 import com.oracleclub.server.entity.param.AttachmentParam;
 import com.oracleclub.server.entity.vo.AttachmentVO;
 import com.oracleclub.server.service.base.ConverterService;
 import com.oracleclub.server.service.base.CrudService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -19,7 +18,7 @@ public interface AttachmentService extends CrudService<Attachment,Long>,Converte
 
     Attachment upload(MultipartFile file);
 
-    Page<AttachmentVO> pageByParam(Pageable pageable, AttachmentParam attachmentParam);
+    IPage<AttachmentVO> pageByParam(IPage<Attachment> pageable, AttachmentParam attachmentParam);
 
     List<Attachment> rollbackFromRemove(List<Long> ids);
 

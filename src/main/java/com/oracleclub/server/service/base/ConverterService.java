@@ -1,6 +1,6 @@
 package com.oracleclub.server.service.base;
 
-import org.springframework.data.domain.Page;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import java.util.List;
 
@@ -13,5 +13,5 @@ public interface ConverterService<VO,DOMAIN> {
 
     List<VO> convertToListVO(List<DOMAIN> domains);
 
-    Page<VO> convertToPageVO(Page<DOMAIN> domains);
+    IPage<VO> convertToPageVO(IPage<DOMAIN> domains);
 }

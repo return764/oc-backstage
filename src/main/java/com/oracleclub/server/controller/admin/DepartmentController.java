@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author RETURN
@@ -25,12 +26,16 @@ public class DepartmentController {
 
     @GetMapping("{id:\\d+}")
     public R getOne(@PathVariable Long id) {
-        return R.success("获取部门成功",departmentService.convertToVO(departmentService.getByIdExist(id)));
+        Department department = departmentService.getByIdExist(id);
+        log.debug(department.toString());
+        return R.success("获取部门成功",departmentService.convertToVO(department));
     }
 
     @GetMapping
     public R listDepartment(){
-        return R.success("获取部门列表成功",departmentService.convertToListVO(departmentService.listAllExist()));
+        List<Department> departments = departmentService.listAllExist();
+        log.debug(departments.toString());
+        return R.success("获取部门列表成功",departmentService.convertToListVO(departments));
     }
 
     @DeleteMapping("{id:\\d+}")

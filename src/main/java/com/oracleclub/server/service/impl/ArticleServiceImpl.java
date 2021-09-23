@@ -1,6 +1,9 @@
 package com.oracleclub.server.service.impl;
 
-import com.oracleclub.server.dao.ArticleDao;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.oracleclub.server.dao.ArticleMapper;
 import com.oracleclub.server.entity.Article;
 import com.oracleclub.server.entity.enums.ArticleStatus;
 import com.oracleclub.server.entity.param.ArticleQueryParam;
@@ -12,18 +15,15 @@ import com.oracleclub.server.service.ArticleService;
 import com.oracleclub.server.service.base.AbstractCrudService;
 import com.oracleclub.server.utils.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -34,11 +34,11 @@ import java.util.stream.Collectors;
 @Service
 public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implements ArticleService {
 
-    private final ArticleDao articleDao;
+    private final ArticleMapper articleMapper;
 
-    protected ArticleServiceImpl(ArticleDao articleDao) {
-        super(articleDao);
-        this.articleDao = articleDao;
+    protected ArticleServiceImpl(ArticleMapper articleMapper) {
+        super(articleMapper);
+        this.articleMapper = articleMapper;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
         Assert.notNull(status, "Post status must not be null");
         Assert.notNull(id, "Post id must not be null");
 
-        Optional<Article> articleOptional = articleDao.findByIdAndStatus(id,status);
+        Optional<Article> articleOptional = articleMapper.findByIdAndStatus(id,status);
 
         return articleOptional.orElseThrow(()-> new NotFoundException("查询文章信息失败").setErrorData(id));
     }
@@ -55,39 +55,45 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
     public List<Article> listAllBy(ArticleStatus status) {
         Assert.notNull(status,"Article status must not be null");
 
-        return articleDao.findAllByStatus(status);
+        return articleMapper.findAllByStatus(status);
     }
 
     @Override
     public List<Article> listLatest(int top) {
         Assert.isTrue(top > 0,"Top number must not be less than 0");
 
-        PageRequest pageRequest = PageRequest.of(0,top, Sort.by(Sort.Direction.DESC,"id"));
+        Page<Article> pageRequest = new Page<>(0,top);
+        return articleMapper.selectPage(pageRequest,getArticlePublishAndDESCWrapper()).getRecords();
+    }
 
-        return articleDao.findAllByStatus(ArticleStatus.PUBLISHED,pageRequest).getContent();
+    private QueryWrapper<Article> getArticlePublishAndDESCWrapper() {
+        QueryWrapper<Article> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("status",ArticleStatus.PUBLISHED)
+                .orderByDesc("created_at");
+        return queryWrapper;
     }
 
     @Override
     public Page<Article> pageLatest(int top) {
         Assert.isTrue(top > 0,"Top number must not be less than 0");
 
-        PageRequest pageRequest = PageRequest.of(0,top, Sort.by(Sort.Direction.DESC,"id"));
+        Page<Article> pageRequest = new Page<>(0,top);
 
-        return listAll(pageRequest);
+        return articleMapper.selectPage(pageRequest,getArticlePublishAndDESCWrapper());
     }
 
     @Override
-    public Page<Article> pageBy(Pageable pageable) {
+    public IPage<Article> pageBy(IPage<Article> pageable) {
         Assert.notNull(pageable, "Page info must not be null");
 
         return listAll(pageable);
     }
 
     @Override
-    public Page<Article> pageBy(ArticleQueryParam queryParam, Pageable pageable) {
+    public IPage<Article> pageBy(ArticleQueryParam queryParam, IPage<Article> pageable) {
         Assert.notNull(pageable, "Page info must not be null");
 
-        return articleDao.findAllExist(buildQuery(queryParam),pageable);
+        return articleMapper.findAllExistWithParams(pageable, queryParam);
     }
 
     @Override
@@ -98,46 +104,14 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
     }
 
     @Override
-    public Page<ArticleSimpleVO> convertToSimplePage(Page<Article> articles) {
-        return articles.map(this::convertToSimple);
+    public IPage<ArticleSimpleVO> convertToSimplePage(IPage<Article> articles) {
+
+        return articles.convert(this::convertToSimple);
     }
 
     @Override
     public List<ArticleSimpleVO> convertToSimpleList(List<Article> articles) {
         return articles.stream().map(this::convertToSimple).collect(Collectors.toList());
-    }
-
-    private Specification<Article> buildQuery(ArticleQueryParam queryParam) {
-        Assert.notNull(queryParam, "文章查询参数不能为空");
-
-        return (Specification<Article>)(root, cq, cb) -> {
-            List<Predicate> predicates = new LinkedList<>();
-            if (queryParam.getAuthor() != null){
-                predicates.add(cb.like(root.get("author").as(String.class),"%"+queryParam.getAuthor()+"%"));
-            }
-
-            if (queryParam.getTitle() != null){
-                predicates.add(cb.like(root.get("title").as(String.class),"%"+queryParam.getTitle()+"%"));
-            }
-
-            if (queryParam.getDescription() != null){
-                predicates.add(cb.like(root.get("description").as(String.class),"%"+queryParam.getDescription()+"%"));
-            }
-
-            if (queryParam.getStatus() != null){
-                predicates.add(cb.equal(root.get("status").as(ArticleStatus.class),queryParam.getStatus()));
-            }
-
-            if (queryParam.getCreatedStart() != null){
-                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt").as(LocalDateTime.class),queryParam.getCreatedStart()));
-            }
-
-            if (queryParam.getCreatedEnd() != null){
-                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt").as(LocalDateTime.class),queryParam.getCreatedEnd()));
-            }
-
-            return cq.where(predicates.toArray(new Predicate[0])).getRestriction();
-        };
     }
 
     @Override
@@ -159,7 +133,7 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
         Article article = getById(articleId);
 
         if (!status.equals(article.getStatus())){
-            int row = articleDao.updateStatus(status, articleId);
+            int row = articleMapper.updateStatus(status, articleId);
             if (row != 1){
                 throw new ServiceException("Failed to update article status of article with id "+articleId);
             }
@@ -197,8 +171,8 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
     }
 
     @Override
-    public Page<ArticleDetailVO> convertToPageVO(Page<Article> articles){
-        return articles.map(this::convertToVO);
+    public IPage<ArticleDetailVO> convertToPageVO(IPage<Article> articles){
+        return articles.convert(this::convertToVO);
     }
 
     private ArticleDetailVO convertTo(Article article){
@@ -217,7 +191,7 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
         Assert.isTrue(visits > 0,"visits to increase must be less than 1");
         Assert.notNull(articleId,"article id is must not be null");
 
-        long affectedRows = articleDao.updateVisits(visits,articleId);
+        long affectedRows = articleMapper.updateVisits(visits,articleId);
 
         if (affectedRows != 1){
             log.error("Article with id: [{}] may not be found",articleId);
@@ -230,7 +204,7 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
         Assert.isTrue(likes > 0,"visits to increase must be less than 1");
         Assert.notNull(articleId,"article id is must not be null");
 
-        long affectedRows = articleDao.updateLikes(likes,articleId);
+        long affectedRows = articleMapper.updateLikes(likes,articleId);
 
         if (affectedRows != 1){
             log.error("Article with id: [{}] may not be found",articleId);

@@ -2,21 +2,25 @@ package com.oracleclub.server.entity.support;
 
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.id.IdentityGenerator;
-
-import java.io.Serializable;
+import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
+import org.springframework.stereotype.Component;
 
 /**
  * @author :RETURN
  * @date :2021/2/26 0:23
  */
-public class CustomIdGenerator extends IdentityGenerator {
+@Component
+public class CustomIdGenerator implements IdentifierGenerator {
 
     private final Snowflake snowflake = IdUtil.getSnowflake(1,1);
 
     @Override
-    public Serializable generate(SharedSessionContractImplementor s, Object obj) {
+    public Number nextId(Object entity) {
         return snowflake.nextId();
+    }
+
+    @Override
+    public String nextUUID(Object entity) {
+        return snowflake.nextIdStr();
     }
 }

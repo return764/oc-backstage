@@ -6,7 +6,7 @@ import com.oracleclub.server.converter.OutputConverter;
 import com.oracleclub.server.entity.Department;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @author :RETURN
@@ -20,6 +20,6 @@ public class DepartmentVO implements OutputConverter<DepartmentVO, Department> {
     private String name;
     private String aliasName;
     private String content;
-    private Date createdAt;
-    private Date updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

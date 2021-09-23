@@ -27,11 +27,17 @@ spring:
     username: root
     password: root
     type: com.alibaba.druid.pool.DruidDataSource
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    open-in-view: false
+
+mybatis-plus:
+  typeAliasesPackage: com.oracleclub.server.entity
+  mapperLocations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
+  global-config:
+    banner: false
+  type-enums-package: com.oracleclub.server.entity.enums
+
 logging:
   level:
     com.oracleclub.server: DEBUG

@@ -7,6 +7,6 @@ import com.oracleclub.server.entity.Department;
  * @author RETURN
  * @since 2021-02-21 17:10:48
  */
-public interface DepartmentDao extends BaseDao<Department,Long> {
+public interface DepartmentMapper extends BaseDao<Department,Long> {
 
 }

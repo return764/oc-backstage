@@ -1,16 +1,23 @@
 package com.oracleclub.server.config;
 
+import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.pagination.optimize.JsqlParserCountOptimize;
 import com.oracleclub.server.config.properties.AppProperties;
+import com.oracleclub.server.dao.inject.MySqlInject;
+import com.oracleclub.server.handler.page.PageRequestHandlerArgumentResolver;
 import com.oracleclub.server.interceptor.TokenInterceptor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -46,6 +53,10 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("*");
     }
 
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new PageRequestHandlerArgumentResolver());
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -65,4 +76,15 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations(workDir + "pictures/");
     }
 
+    @Bean
+    public PaginationInterceptor paginationInterceptor() {
+        PaginationInterceptor paginationInterceptor = new PaginationInterceptor();
+        paginationInterceptor.setCountSqlParser(new JsqlParserCountOptimize(true));
+        return paginationInterceptor;
+    }
+
+    @Bean
+    public MySqlInject mySqlInject() {
+        return new MySqlInject();
+    }
 }

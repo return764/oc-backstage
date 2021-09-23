@@ -24,7 +24,7 @@ public class UserController {
     public R update(@PathVariable("id") Long id,
                     @RequestBody UserUpdateParam userParam){
         Assert.notNull(userParam,"User参数不能为空");
-        User beforeUpdateUser = userService.getById(id);
+        User beforeUpdateUser = userService.getUserAndDepartment(id);
 
         userParam.update(beforeUpdateUser);
 

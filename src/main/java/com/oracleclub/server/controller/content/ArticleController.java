@@ -1,16 +1,15 @@
 package com.oracleclub.server.controller.content;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oracleclub.server.entity.Article;
 import com.oracleclub.server.entity.enums.ArticleStatus;
 import com.oracleclub.server.entity.param.ArticleQueryParam;
+import com.oracleclub.server.entity.param.PageRequest;
 import com.oracleclub.server.entity.vo.ArticleDetailVO;
 import com.oracleclub.server.entity.vo.ArticleSimpleVO;
+import com.oracleclub.server.handler.page.PageDefault;
 import com.oracleclub.server.service.ArticleService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,12 +40,13 @@ public class ArticleController {
         return articleService.convertToSimpleList(articleService.listLatest(num));
     }
 
+    // todo page参数不能转换
     @GetMapping
-    public Page<ArticleSimpleVO> pageBy(@PageableDefault(sort = "id",direction = Sort.Direction.DESC) Pageable pageable){
+    public IPage<ArticleSimpleVO> pageBy(@PageDefault PageRequest pageable){
         ArticleQueryParam params = new ArticleQueryParam();
         params.setStatus(ArticleStatus.PUBLISHED);
 
-        Page<Article> articles = articleService.pageBy(params,pageable);
+        IPage<Article> articles = articleService.pageBy(params,pageable.convertTo());
         return articleService.convertToSimplePage(articles);
     }
 

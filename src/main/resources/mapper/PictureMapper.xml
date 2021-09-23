@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.oracleclub.server.dao.PictureMapper">
+    <select id="findAllExistWithParams" parameterType="PictureQueryParam" resultType="Picture">
+        SELECT * FROM
+        pictures
+        WHERE
+        deleted_at IS NULL
+        <if test="p.name!=null and p.name!=''">
+            AND `name` LIKE concat('%',#{p.name},'%')
+        </if>
+        <if test="p.type!=null and p.type!=''">
+            AND `type` = #{p.type}
+        </if>
+    </select>
+</mapper>

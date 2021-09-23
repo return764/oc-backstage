@@ -1,5 +1,6 @@
 package com.oracleclub.server.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oracleclub.server.entity.User;
 import com.oracleclub.server.entity.param.RegisterParam;
 import com.oracleclub.server.entity.param.UserQueryParam;
@@ -7,8 +8,6 @@ import com.oracleclub.server.entity.vo.AuthUserVO;
 import com.oracleclub.server.entity.vo.UserVO;
 import com.oracleclub.server.service.base.ConverterService;
 import com.oracleclub.server.service.base.CrudService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -73,7 +72,11 @@ public interface UserService extends CrudService<User,Long>, ConverterService<Us
 
     boolean checkPassword(User user,String password);
 
-    Page<UserVO> pageByParam(Pageable pageable, UserQueryParam userParam);
+    IPage<UserVO> pageBy(IPage<User> pageable, UserQueryParam userParam);
 
     AuthUserVO register(RegisterParam registerParam);
+
+    User getUserAndDepartment(Long id);
+
+    User updateUserInfo(User user);
 }

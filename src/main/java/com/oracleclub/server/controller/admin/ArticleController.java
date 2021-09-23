@@ -1,17 +1,16 @@
 package com.oracleclub.server.controller.admin;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oracleclub.server.entity.Article;
 import com.oracleclub.server.entity.enums.ArticleStatus;
 import com.oracleclub.server.entity.param.ArticleParam;
 import com.oracleclub.server.entity.param.ArticleQueryParam;
+import com.oracleclub.server.entity.param.PageRequest;
 import com.oracleclub.server.entity.vo.ArticleDetailVO;
 import com.oracleclub.server.entity.vo.R;
+import com.oracleclub.server.handler.page.PageDefault;
 import com.oracleclub.server.service.ArticleService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,11 +39,12 @@ public class ArticleController {
         return R.success("成功获取文章",articleService.convertToVO(article));
     }
 
+    // todo page参数不能转换
     @GetMapping
-    public R pageBy(@PageableDefault(sort = "id",direction = Sort.Direction.DESC) Pageable pageable,
+    public R pageBy(@PageDefault PageRequest pageable,
                     ArticleQueryParam queryParam){
         log.debug("ArticleQueryParam:{}",queryParam);
-        Page<Article> articles = articleService.pageBy(queryParam, pageable);
+        IPage<Article> articles = articleService.pageBy(queryParam, pageable.convertTo());
         return R.success("成功获取文章列表",articleService.convertToSimplePage(articles));
     }
 

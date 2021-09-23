@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.oracleclub.server.dao.AttachmentMapper">
+    <select id="findAllWithParams" parameterType="AttachmentParam" resultType="Attachment">
+        SELECT * FROM
+        attachments
+        WHERE 1=1
+        <if test="a.suffix!=null and a.suffix!=''">
+            AND suffix = #{a.suffix}
+        </if>
+        <if test="a.name!=null and a.name!=''">
+            OR `name` LIKE concat('%',#{a.name},'%')
+        </if>
+        AND deleted_at IS
+        <if test="a.deleted == true">
+            NOT
+        </if>
+        NULL
+    </select>
+</mapper>

@@ -1,12 +1,11 @@
 package com.oracleclub.server.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oracleclub.server.entity.Picture;
 import com.oracleclub.server.entity.param.PictureQueryParam;
 import com.oracleclub.server.entity.vo.PictureVO;
 import com.oracleclub.server.service.base.ConverterService;
 import com.oracleclub.server.service.base.CrudService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -29,7 +28,7 @@ public interface PictureService extends CrudService<Picture,Long>, ConverterServ
 
     List<String> getTypes();
 
-    Page<PictureVO> pageByParam(Pageable pageable, PictureQueryParam pictureParam);
+    IPage<PictureVO> pageBy(IPage<Picture> pageable, PictureQueryParam pictureParam);
 
     List<Picture> removePictures(List<Long> ids);
 

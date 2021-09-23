@@ -1,7 +1,9 @@
 package com.oracleclub.server.service.impl;
 
 import cn.hutool.crypto.digest.DigestUtil;
-import com.oracleclub.server.dao.UserDao;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.oracleclub.server.dao.DepartmentMapper;
+import com.oracleclub.server.dao.UserMapper;
 import com.oracleclub.server.entity.Department;
 import com.oracleclub.server.entity.User;
 import com.oracleclub.server.entity.enums.RoleEnum;
@@ -22,9 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.ehcache.Cache;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -34,9 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,7 +47,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserServiceImpl extends AbstractCrudService<User,Long> implements UserService {
 
-    private final UserDao userDao;
+    private final UserMapper userMapper;
+    private final DepartmentMapper departmentMapper;
     private final Cache<String, String> verifyCodeCache;
     private final Cache<String, String> tokenCache;
     private Cache<String,String> refreshTokenCache;
@@ -60,13 +58,15 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
 
     private static final String NICKNAME_REG = "^[\u4E00-\u9FA5A-Za-z\\s+-]{2,64}$";
 
-    protected UserServiceImpl(UserDao userDao,
+    protected UserServiceImpl(UserMapper userMapper,
+                              DepartmentMapper departmentMapper,
                               JavaMailSender mailSender,
                               @Qualifier("verifyCode") Cache<String, String> verifyCodeCache,
                               @Qualifier("refreshTokenCache") Cache<String, String> refreshTokenCache,
                               Cache<String, String> tokenCache) {
-        super(userDao);
-        this.userDao = userDao;
+        super(userMapper);
+        this.userMapper = userMapper;
+        this.departmentMapper = departmentMapper;
         this.mailSender = mailSender;
         this.verifyCodeCache = verifyCodeCache;
         this.tokenCache = tokenCache;
@@ -116,8 +116,10 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         log.debug("邮箱验证码登录开始");
         String matchVerifyCode = verifyCodeCache.get(email);
         if (verifyCode.equals(matchVerifyCode)) {
-            User u = userDao.findByEmail(email);
+            User u = userMapper.findByEmail(email);
             log.debug("当前登录用户:[{}]",u);
+            u.setLoginAt(LocalDateTime.now());
+            userMapper.updateById(u);
             return getAuthUser(u);
         }
         throw new VerifyCodeException("验证码错误");
@@ -125,12 +127,14 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
 
     @Override
     public AuthUserVO loginEmail(String email, String password) {
-        User u = userDao.findByEmail(email);
+        User u = userMapper.findByEmail(email);
         log.debug("当前登录用户:[{}]",u);
         if(u == null){
             throw new LoginException("账号或密码错误");
         }
         if(checkPassword(u,password)){
+            u.setLoginAt(LocalDateTime.now());
+            userMapper.updateById(u);
             return getAuthUser(u);
         }
         throw new LoginException("账号或密码错误");
@@ -138,9 +142,11 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
 
     @Override
     public AuthUserVO loginStuNum(String stuNum, String password) {
-        User u = userDao.findByStuNum(stuNum);
+        User u = userMapper.findByStuNum(stuNum);
         log.debug("当前登录用户:[{}]",u);
         if(checkPassword(u,password)){
+            u.setLoginAt(LocalDateTime.now());
+            userMapper.updateById(u);
             return getAuthUser(u);
         }
         throw new LoginException("密码错误");
@@ -154,77 +160,53 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
     }
 
     @Override
-    public Page<UserVO> pageByParam(Pageable pageable, UserQueryParam userParam) {
+    public IPage<UserVO> pageBy(IPage<User> pageable, UserQueryParam userParam) {
         Assert.notNull(pageable,"分页参数不能为空");
-        Page<User> all = userDao.findAllExist(buildParam(userParam), pageable);
+        IPage<User> all = userMapper.findAllExistWithParams(pageable, userParam);
         return convertToPageVO(all);
     }
 
     @Override
+    @Transactional(rollbackFor = RuntimeException.class)
     public AuthUserVO register(RegisterParam registerParam) {
         Assert.notNull(registerParam,"参数不能为空");
         User user = registerParam.convertTo();
         user.setRole(RoleEnum.VISITOR);
-        user.setStatus(UserStatus.ACTIVE);
+        user.setStatus(UserStatus.NOT_ACTIVE);
+        user.setLoginAt(LocalDateTime.now());
         //检查是否存在学号
         if(user.getStuNum() != null){
-            User test = userDao.findByStuNum(user.getStuNum());
+            User test = userMapper.findByStuNum(user.getStuNum());
             if (test!=null){
                 throw new UserException("学号已存在");
             }
         }
         //检查是否存在邮箱
         if(user.getEmail() != null){
-            User test = userDao.findByEmail(user.getEmail());
+            User test = userMapper.findByEmail(user.getEmail());
             if (test!=null){
                 throw new UserException("邮箱已存在");
             }
         }
-        User u = userDao.save(user);
+        //加密密码
+        user.setPassword(DigestUtil.md5Hex(user.getPassword()));
+        userMapper.insert(user);
+        User u = userMapper.findUserById(user.getId());
         return getAuthUser(u);
     }
 
-    private static Specification<User> buildParam(UserQueryParam userParam){
-        Assert.notNull(userParam,"用户列表查询数据不能为空");
+    @Override
+    public User getUserAndDepartment(Long id) {
+        return userMapper.findUserById(id);
+    }
 
-        return (Specification<User>) (root, cq, cb) -> {
-            List<Predicate> predicates = new LinkedList<>();
+    @Transactional(rollbackFor = RuntimeException.class)
+    @Override
+    public User updateUserInfo(User user) {
 
-            if (userParam.getName() != null){
-                predicates.add(cb.like(root.get("name").as(String.class),"%"+userParam.getName()+"%"));
-            }
+        userMapper.updateUserInfoBy(user);
 
-            if (userParam.getDepId() != null){
-                predicates.add(cb.equal(root.join("department").get("id").as(Long.class),userParam.getDepId()));
-            }
-
-            if (userParam.getEmail() != null){
-                predicates.add(cb.like(root.get("email").as(String.class),"%"+userParam.getEmail()+"%"));
-            }
-
-            if (userParam.getPhNum() != null){
-                predicates.add(cb.like(root.get("phNum").as(String.class),"%"+userParam.getPhNum()+"%"));
-            }
-
-            if (userParam.getStuNum() != null){
-                predicates.add(cb.like(root.get("stuNum").as(String.class),"%"+userParam.getStuNum()+"%"));
-            }
-
-            if (userParam.getStatus() != null){
-                predicates.add(cb.equal(root.get("status").as(UserStatus.class),userParam.getStatus()));
-            }
-
-            if (userParam.getLoginStart() != null){
-                predicates.add(cb.greaterThanOrEqualTo(root.get("loginAt").as(LocalDateTime.class),userParam.getLoginStart()));
-            }
-
-            if (userParam.getLoginEnd() != null){
-                predicates.add(cb.lessThanOrEqualTo(root.get("loginAt").as(LocalDateTime.class),userParam.getLoginEnd()));
-            }
-
-
-            return cq.where(predicates.toArray(new Predicate[0])).getRestriction();
-        };
+        return userMapper.selectById(user.getId());
     }
 
     @Override
@@ -245,8 +227,8 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
     }
 
     @Override
-    public Page<UserVO> convertToPageVO(Page<User> users) {
-        return users.map(this::convertToVO);
+    public IPage<UserVO> convertToPageVO(IPage<User> users) {
+        return users.convert(this::convertToVO);
     }
 
     private AuthUserVO getAuthUser(User user) {

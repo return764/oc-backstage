@@ -1,6 +1,7 @@
 package com.oracleclub.server.service.impl;
 
-import com.oracleclub.server.dao.AttachmentDao;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.oracleclub.server.dao.AttachmentMapper;
 import com.oracleclub.server.entity.Attachment;
 import com.oracleclub.server.entity.enums.UploadFileType;
 import com.oracleclub.server.entity.param.AttachmentParam;
@@ -13,15 +14,10 @@ import com.oracleclub.server.service.AttachmentService;
 import com.oracleclub.server.service.base.AbstractCrudService;
 import com.oracleclub.server.utils.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.criteria.Predicate;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,13 +29,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> implements AttachmentService {
 
-    private final AttachmentDao attachmentDao;
+    private final AttachmentMapper attachmentMapper;
     private final FileHandlers fileHandlers;
     private final AttachmentUpload attachmentUpload;
 
-    public AttachmentServiceImpl(AttachmentDao attachmentDao,FileHandlers fileHandlers, AttachmentUpload attachmentUpload) {
-        super(attachmentDao);
-        this.attachmentDao = attachmentDao;
+    public AttachmentServiceImpl(AttachmentMapper attachmentMapper, FileHandlers fileHandlers, AttachmentUpload attachmentUpload) {
+        super(attachmentMapper);
+        this.attachmentMapper = attachmentMapper;
         this.fileHandlers = fileHandlers;
         this.attachmentUpload = attachmentUpload;
     }
@@ -59,10 +55,10 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
     }
 
     @Override
-    public Page<AttachmentVO> convertToPageVO(Page<Attachment> attachments) {
+    public IPage<AttachmentVO> convertToPageVO(IPage<Attachment> attachments) {
         Assert.notNull(attachments,"待转换附件列表不能为空");
 
-        return attachments.map(this::convertToVO);
+        return attachments.convert(this::convertToVO);
     }
 
     @Override
@@ -91,26 +87,18 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
     }
 
     @Override
-    public Page<AttachmentVO> pageByParam(Pageable pageable, AttachmentParam attachmentParam) {
+    public IPage<AttachmentVO> pageByParam(IPage<Attachment> pageable, AttachmentParam attachmentParam) {
         Assert.notNull(pageable,"分页参数不能为空");
-        Specification<Attachment> param = buildParam(attachmentParam);
-        Page<Attachment> attachmentPage = null;
-        if (attachmentParam.isDeleted()){
-            attachmentPage = attachmentDao.findAll(param, pageable);
-        }else {
-            attachmentPage = attachmentDao.findAllExist(param, pageable);
-        }
+        IPage<Attachment> attachmentPage = attachmentMapper.findAllWithParams(pageable,attachmentParam);
         return convertToPageVO(attachmentPage);
     }
 
     @Override
     public List<Attachment> rollbackFromRemove(List<Long> ids) {
         Assert.notEmpty(ids,"idList不能为空");
-        List<Attachment> attachments = attachmentDao.findAllById(ids);
-        attachments.forEach(attachment -> {
-            attachment.setDeletedAt(null);
-        });
-        return updateInBatch(attachments);
+        ids.forEach(this::rollBackById);
+
+        return attachmentMapper.selectBatchIds(ids);
     }
 
     @Override
@@ -127,22 +115,4 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
         return attachment;
     }
 
-    private Specification<Attachment> buildParam(AttachmentParam attachmentParam) {
-        Assert.notNull(attachmentParam,"附件参数不能为空");
-
-        return (Specification<Attachment>) (root, cq, cb) -> {
-            List<Predicate> predicates = new LinkedList<>();
-
-            if (attachmentParam.getSuffix() != null){
-                predicates.add(cb.equal(root.get("suffix").as(String.class), attachmentParam.getSuffix()));
-            }
-
-            if (attachmentParam.getName() != null){
-                predicates.add(cb.or(
-                        cb.like(root.get("name").as(String.class),"%"+attachmentParam.getName().trim()+"%")
-                ));
-            }
-            return cq.where(predicates.toArray(new Predicate[0])).getRestriction();
-        };
-    }
 }

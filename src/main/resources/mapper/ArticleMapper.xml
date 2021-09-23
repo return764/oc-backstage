@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.oracleclub.server.dao.ArticleMapper">
+    <select id="findAllExistWithParams" parameterType="ArticleQueryParam" resultType="Article">
+        SELECT * FROM
+        articles
+        WHERE
+        deleted_at IS NULL
+        <if test="a.author!=null and a.author!=''">
+            AND author LIKE concat('%',#{a.author},'%')
+        </if>
+        <if test="a.title!=null and a.title!=''">
+            AND title LIKE concat('%',#{a.title},'%')
+        </if>
+        <if test="a.description!=null and a.description!=''">
+            AND description LIKE concat('%',#{a.description},'%')
+        </if>
+        <if test="a.status!=null">
+            AND status = #{a.status}
+        </if>
+        <if test="a.createdStart!=null">
+            AND created_at <![CDATA[ >= ]]> #{a.createdStart}
+        </if>
+        <if test="a.createdEnd!=null">
+            AND created_at <![CDATA[ <= ]]> #{a.createdEnd}
+        </if>
+        ORDER BY created_at DESC
+    </select>
+</mapper>

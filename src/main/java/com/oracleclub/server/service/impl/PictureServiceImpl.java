@@ -1,6 +1,9 @@
 package com.oracleclub.server.service.impl;
 
-import com.oracleclub.server.dao.PictureDao;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.oracleclub.server.dao.PictureMapper;
 import com.oracleclub.server.entity.Picture;
 import com.oracleclub.server.entity.enums.PictureStatus;
 import com.oracleclub.server.entity.enums.UploadFileType;
@@ -14,17 +17,10 @@ import com.oracleclub.server.service.PictureService;
 import com.oracleclub.server.service.base.AbstractCrudService;
 import com.oracleclub.server.utils.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.criteria.Predicate;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,13 +34,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implements PictureService {
 
-    private final PictureDao pictureDao;
+    private final PictureMapper pictureMapper;
     private final FileHandlers fileHandlers;
     private final PictureUpload pictureUpload;
 
-    protected PictureServiceImpl(PictureDao pictureDao,FileHandlers fileHandlers, PictureUpload pictureUpload) {
-        super(pictureDao);
-        this.pictureDao = pictureDao;
+    protected PictureServiceImpl(PictureMapper pictureMapper, FileHandlers fileHandlers, PictureUpload pictureUpload) {
+        super(pictureMapper);
+        this.pictureMapper = pictureMapper;
         this.fileHandlers = fileHandlers;
         this.pictureUpload = pictureUpload;
     }
@@ -56,12 +52,13 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
 
     @Override
     public List<PictureVO> convertToListVO(List<Picture> pictures) {
+        log.debug("{}",pictures);
         return pictures.stream().map(this::convertTo).collect(Collectors.toList());
     }
 
     @Override
-    public Page<PictureVO> convertToPageVO(Page<Picture> pictures) {
-        return pictures.map(this::convertTo);
+    public IPage<PictureVO> convertToPageVO(IPage<Picture> pictures) {
+        return pictures.convert(this::convertTo);
     }
 
     private PictureVO convertTo(Picture picture){
@@ -74,8 +71,15 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
     public List<Picture> listLatest(int top) {
         Assert.isTrue(top > 0,"Top number must not be less than 0");
 
-        PageRequest pageRequest = PageRequest.of(0,top, Sort.by(Sort.Direction.DESC,"id"));
-        return pictureDao.findAllByStatus(PictureStatus.EXIST,pageRequest).getContent();
+        Page<Picture> pageRequest = new Page<>(0,top);
+        return pictureMapper.selectPage(pageRequest,getPictureExistAndDESCWrapper()).getRecords();
+    }
+
+    private QueryWrapper<Picture> getPictureExistAndDESCWrapper() {
+        QueryWrapper<Picture> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("status", PictureStatus.EXIST)
+                .orderByDesc("id");
+        return queryWrapper;
     }
 
     @Override
@@ -113,14 +117,14 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
 
     @Override
     public List<String> getTypes() {
-        return pictureDao.findAllTypes();
+        return pictureMapper.findAllTypes();
     }
 
     @Override
-    public Page<PictureVO> pageByParam(Pageable pageable, PictureQueryParam pictureParam) {
+    public IPage<PictureVO> pageBy(IPage<Picture> pageable, PictureQueryParam pictureParam) {
         Assert.notNull(pageable,"分页参数不能为空");
 
-        Page<Picture> all = pictureDao.findAllExist(buildQuery(pictureParam), pageable);
+        IPage<Picture> all = pictureMapper.findAllExistWithParams(pageable,pictureParam);
         return convertToPageVO(all);
     }
 
@@ -138,24 +142,5 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
 
         return picture;
     }
-
-    private Specification<Picture> buildQuery(PictureQueryParam pictureParam) {
-        Assert.notNull(pictureParam,"参数不能为空");
-        return (Specification<Picture>) (root, cq, cb) -> {
-            List<Predicate> predicates = new LinkedList<>();
-
-            if (pictureParam.getType() != null){
-                predicates.add(cb.equal(root.get("type").as(String.class),pictureParam.getType().trim()));
-            }
-
-            if (pictureParam.getName() != null){
-                predicates.add(cb.or(
-                        cb.like(root.get("name").as(String.class),"%"+pictureParam.getName().trim()+"%")
-                ));
-            }
-            return cq.where(predicates.toArray(new Predicate[0])).getRestriction();
-        };
-    }
-
 
 }

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.oracleclub.server.dao.UserMapper">
+    <resultMap id="userMap" type="User">
+        <id property="id" column="id"/>
+        <result property="nickname" column="nickname"/>
+        <result property="name" column="name"/>
+        <result property="stuNum" column="stu_num"/>
+        <result property="email" column="email"/>
+        <result property="password" column="password"/>
+        <result property="phNum" column="ph_num"/>
+        <result property="info" column="info"/>
+        <result property="avatar" column="avatar"/>
+        <result property="birthday" column="birthday"/>
+        <result property="status" column="status"/>
+        <result property="role" column="role"/>
+        <result property="ipAddr" column="ip_addr"/>
+        <result property="loginAt" column="login_at"/>
+
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="deletedAt" column="deleted_at"/>
+
+        <association property="department" javaType="Department" column="id">
+            <id property="id" column="id"/>
+            <result property="name" column="dep_name"/>
+            <result property="aliasName" column="dep_alias_name"/>
+            <result property="content" column="dep_content"/>
+        </association>
+    </resultMap>
+
+    <select id="findAllExistWithParams" parameterType="UserQueryParam" resultMap="userMap">
+        SELECT * FROM
+        users u
+        LEFT JOIN departments d
+        ON u.dep_id = d.id
+        WHERE
+        u.deleted_at IS NULL
+        <if test="u.name!=null and u.name!=''">
+            AND u.name LIKE concat('%',#{u.name},'%')
+        </if>
+        <if test="u.depId!=null and u.depId!=''">
+            AND u.dep_id = #{u.depId}
+        </if>
+        <if test="u.email!=null and u.email!=''">
+            AND u.email LIKE concat('%',#{u.email},'%')
+        </if>
+        <if test="u.phNum!=null and u.phNum!=''">
+            AND u.ph_num LIKE concat('%',#{u.phNum},'%')
+        </if>
+        <if test="u.stuNum!=null and u.stuNum!=''">
+            AND u.stu_num LIKE concat('%',#{u.stuNum},'%')
+        </if>
+        <if test="u.status!=null">
+            AND u.status = #{u.status}
+        </if>
+        <if test="u.loginStart!=null">
+            AND u.login_at <![CDATA[ >= ]]> #{u.loginStart}
+        </if>
+        <if test="u.loginEnd!=null">
+            AND u.login_at <![CDATA[ <= ]]> #{u.loginEnd}
+        </if>
+
+    </select>
+
+    <select id="findUserById" resultMap="userMap" parameterType="Long">
+        SELECT
+        *
+        FROM users u LEFT JOIN
+            departments d ON u.dep_id = d.id WHERE u.id = #{id}
+    </select>
+
+    <select id="findByEmail" resultMap="userMap" parameterType="String">
+        SELECT
+        *
+        FROM users u LEFT JOIN
+            departments d ON u.dep_id = d.id WHERE u.email = #{email}
+    </select>
+
+    <select id="findByStuNum" resultMap="userMap" parameterType="String">
+        SELECT
+        *
+        FROM users u LEFT JOIN
+            departments d ON u.dep_id = d.id WHERE u.stu_num = #{stuNum}
+    </select>
+
+    <update id="updateUserInfoBy" parameterType="User">
+        UPDATE
+        users u
+        SET
+        u.nickname = #{u.nickname},
+        u.name = #{u.name},
+        u.dep_id = #{u.department.id},
+        u.email = #{u.email},
+        u.ph_num = #{u.phNum},
+        u.stu_num = #{u.stuNum},
+        u.status = #{u.status},
+        u.info = #{u.info},
+        u.avatar = #{u.avatar},
+        u.birthday = #{u.birthday},
+        u.role = #{u.role},
+        u.ip_addr = #{u.ipAddr},
+        u.login_at = #{u.loginAt}
+        WHERE
+        u.id = #{u.id}
+    </update>
+
+</mapper>

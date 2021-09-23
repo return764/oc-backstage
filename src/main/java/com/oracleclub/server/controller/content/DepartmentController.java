@@ -1,5 +1,6 @@
 package com.oracleclub.server.controller.content;
 
+import com.oracleclub.server.entity.Department;
 import com.oracleclub.server.entity.vo.DepartmentVO;
 import com.oracleclub.server.service.DepartmentService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,8 @@ public class DepartmentController {
 
     @GetMapping
     public List<DepartmentVO> list(){
-        return departmentService.convertToListVO(departmentService.listAllExist());
+        List<Department> departments = departmentService.listAllExist();
+        log.debug(departments.toString());
+        return departmentService.convertToListVO(departments);
     }
 }

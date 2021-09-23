@@ -1,14 +1,13 @@
 package com.oracleclub.server.controller.admin;
 
 import com.oracleclub.server.entity.User;
+import com.oracleclub.server.entity.param.PageRequest;
 import com.oracleclub.server.entity.param.UserQueryParam;
 import com.oracleclub.server.entity.param.UserUpdateParam;
 import com.oracleclub.server.entity.vo.R;
+import com.oracleclub.server.handler.page.PageDefault;
 import com.oracleclub.server.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -26,11 +25,13 @@ public class UserController {
     @Resource
     UserService userService;
 
+    // todo page参数不能转换
     @GetMapping
-    public R listUsers(@PageableDefault(sort = "id",direction = Sort.Direction.DESC) Pageable pageable,
+    public R listUsers(@PageDefault PageRequest pageable,
                        UserQueryParam userQueryParam){
         log.debug("params:{}",userQueryParam);
-        return R.success("成功获取成员列表",userService.pageByParam(pageable,userQueryParam));
+        log.debug("PageRequest:{}",pageable);
+        return R.success("成功获取成员列表",userService.pageBy(pageable.convertTo(),userQueryParam));
     }
 
     @DeleteMapping("{id:\\d+}")
@@ -65,7 +66,8 @@ public class UserController {
 
         userUpdateParam.update(user);
 
-        User u = userService.update(user);
+        log.debug("更新user:{}",user);
+        User u = userService.updateUserInfo(user);
         return R.success("成功更新用户",userService.convertToVO(u));
     }
 }

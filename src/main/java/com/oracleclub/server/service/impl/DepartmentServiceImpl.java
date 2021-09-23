@@ -1,12 +1,12 @@
 package com.oracleclub.server.service.impl;
 
-import com.oracleclub.server.dao.DepartmentDao;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.oracleclub.server.dao.DepartmentMapper;
 import com.oracleclub.server.entity.Department;
 import com.oracleclub.server.entity.vo.DepartmentVO;
 import com.oracleclub.server.service.DepartmentService;
 import com.oracleclub.server.service.base.AbstractCrudService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DepartmentServiceImpl extends AbstractCrudService<Department,Long> implements DepartmentService {
 
-    private DepartmentDao departmentDao;
+    private DepartmentMapper departmentMapper;
 
-    protected DepartmentServiceImpl(DepartmentDao departmentDao) {
-        super(departmentDao);
-        this.departmentDao = departmentDao;
+    protected DepartmentServiceImpl(DepartmentMapper departmentMapper) {
+        super(departmentMapper);
+        this.departmentMapper = departmentMapper;
     }
 
     @Override
@@ -41,10 +41,10 @@ public class DepartmentServiceImpl extends AbstractCrudService<Department,Long> 
     }
 
     @Override
-    public Page<DepartmentVO> convertToPageVO(Page<Department> departments) {
+    public IPage<DepartmentVO> convertToPageVO(IPage<Department> departments) {
         Assert.notNull(departments,"待转换的部门列表不能为空");
 
-        return departments.map(this::convertToVO) ;
+        return departments.convert(this::convertToVO) ;
     }
 
     @Override
@@ -59,6 +59,6 @@ public class DepartmentServiceImpl extends AbstractCrudService<Department,Long> 
 
     @Override
     public List<Department> listAllExist() {
-        return departmentDao.findAllExist();
+        return departmentMapper.selectAllExist();
     }
 }

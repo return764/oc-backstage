@@ -1,33 +1,34 @@
 package com.oracleclub.server.service.base;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oracleclub.server.dao.base.BaseDao;
 import com.oracleclub.server.entity.base.BaseEntity;
 import com.oracleclub.server.exception.NotFoundException;
 import com.oracleclub.server.utils.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+
+import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author :RETURN
  * @date :2021/2/23 11:23
  */
 @Slf4j
-public abstract class AbstractCrudService<DOMAIN extends BaseEntity,ID> implements CrudService<DOMAIN,ID> {
+public abstract class AbstractCrudService<DOMAIN extends BaseEntity,ID extends Serializable> implements CrudService<DOMAIN,ID> {
 
-    private final BaseDao<DOMAIN,ID> baseDao;
+    private final BaseDao<DOMAIN,ID> baseMapper;
     private final String domainName;
 
-    protected AbstractCrudService(BaseDao<DOMAIN,ID> baseDao){
-        this.baseDao = baseDao;
+    protected AbstractCrudService(BaseDao<DOMAIN,ID> baseMapper){
+        this.baseMapper = baseMapper;
 
         @SuppressWarnings("unchecked")
         Class<DOMAIN> domainClass = (Class<DOMAIN>) fetchType(0);
@@ -42,26 +43,25 @@ public abstract class AbstractCrudService<DOMAIN extends BaseEntity,ID> implemen
 
     @Override
     public List<DOMAIN> listAll() {
-        return baseDao.findAll();
+        return baseMapper.selectList(null);
     }
 
     @Override
-    public Page<DOMAIN> listAll(Pageable pageable) {
-        return baseDao.findAll(pageable);
+    public IPage<DOMAIN> listAll(IPage<DOMAIN> pageable) {
+        return baseMapper.selectPage(pageable,null);
     }
 
     @Override
     public List<DOMAIN> listAllByIds(Collection<ID> ids) {
-        return CollectionUtils.isEmpty(ids) ? Collections.emptyList() : baseDao.findAllById(ids);
+        return CollectionUtils.isEmpty(ids) ? Collections.emptyList() : baseMapper.selectBatchIds(ids);
     }
 
     private Optional<DOMAIN> fetchById(ID id,boolean expand) {
         Assert.notNull(id, domainName + "不能为空");
-        //todo 重大bug 分离此方法 总共分为 查询带deletedAt 和 不带deletedAt 此方法改为私有
         if (expand){
-            return baseDao.findById(id);
+            return Optional.ofNullable(baseMapper.selectById(id));
         }
-        return baseDao.findByIdExist(id);
+        return Optional.ofNullable(baseMapper.selectById(id));
     }
 
     @Override
@@ -87,41 +87,42 @@ public abstract class AbstractCrudService<DOMAIN extends BaseEntity,ID> implemen
     @Override
     public boolean existById(ID id) {
         Assert.notNull(id, domainName + " id must not be null");
+        QueryWrapper<DOMAIN> wrapper = new QueryWrapper<>();
+        wrapper.eq("id",id)
+                .isNull("deleted_at");
 
-        return baseDao.existsById(id);
+        return !Objects.isNull(baseMapper.selectOne(wrapper));
     }
 
     @Override
     public long count() {
-        return baseDao.count();
+        return baseMapper.selectCount(null);
     }
 
     @Override
     public DOMAIN create(DOMAIN domain) {
         Assert.notNull(domain, domainName + " data must not be null");
-
-        return baseDao.save(domain);
+        baseMapper.insert(domain);
+        return baseMapper.selectById(domain.getId());
     }
 
     @Override
     public List<DOMAIN> createInBatch(Collection<DOMAIN> domains) {
-        return CollectionUtils.isEmpty(domains) ? Collections.emptyList() : baseDao.saveAll(domains);
-    }
-
-    @Override
-    public void flush() {
-        baseDao.flush();
+        return CollectionUtils.isEmpty(domains) ? Collections.emptyList() : baseMapper.insertInBatch(domains);
     }
 
     @Override
     public DOMAIN update(DOMAIN domain) {
         Assert.notNull(domain, domainName + " data must not be null");
-        return baseDao.saveAndFlush(domain);
+        baseMapper.updateById(domain);
+        return baseMapper.selectById(domain.getId());
     }
 
     @Override
     public List<DOMAIN> updateInBatch(Collection<DOMAIN> domains) {
-        return CollectionUtils.isEmpty(domains) ? Collections.emptyList() : baseDao.saveAll(domains);
+        domains.forEach(baseMapper::updateById);
+        List<ID> idList = (List<ID>) domains.stream().map(DOMAIN::getId).collect(Collectors.toList());
+        return CollectionUtils.isEmpty(domains) ? Collections.emptyList() : baseMapper.selectBatchIds(idList);
     }
 
     @Override
@@ -135,31 +136,31 @@ public abstract class AbstractCrudService<DOMAIN extends BaseEntity,ID> implemen
     @Override
     public DOMAIN removeById(ID id) {
         DOMAIN domain = getById(id);
-
-        remove(domain);
+        baseMapper.deleteById(id);
         return domain;
     }
 
     @Override
     public DOMAIN removeByIdOfNullable(ID id) {
-        return fetchById(id,true).map(domain -> {
-            remove(domain);
-            return domain;
-        }).orElse(null);
-    }
-
-    @Override
-    public void remove(DOMAIN domain) {
-        Assert.notNull(domain, domainName + " data must not be null");
-
-        baseDao.delete(domain);
+        return Optional.of(removeById(id)).orElse(null);
     }
 
     @Override
     public DOMAIN removeLogicById(ID id) {
         Assert.notNull(id,"id must not be null");
+        DOMAIN domain = getById(id);
+        domain.setDeletedAt(LocalDateTime.now());
+        baseMapper.updateById(domain);
+        return domain;
+    }
 
-        return baseDao.logicDelete(id);
+    @Override
+    public DOMAIN rollBackById(ID id) {
+        Assert.notNull(id,"id must not be null");
+        DOMAIN domain = getById(id);
+        domain.setDeletedAt(null);
+        baseMapper.updateById(domain);
+        return domain;
     }
 
     @Override
@@ -169,23 +170,8 @@ public abstract class AbstractCrudService<DOMAIN extends BaseEntity,ID> implemen
             return;
         }
 
-        baseDao.deleteByIdIn(ids);
+        baseMapper.deleteBatchIds(ids);
     }
-
-    @Override
-    public void removeAll(Collection<DOMAIN> domains) {
-        if (CollectionUtils.isEmpty(domains)) {
-            log.debug(domainName + " collection is empty");
-            return;
-        }
-        baseDao.deleteInBatch(domains);
-    }
-
-    @Override
-    public void removeAll() {
-        baseDao.deleteAll();
-    }
-
 
 
 }

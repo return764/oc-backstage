@@ -1,7 +1,6 @@
 package com.oracleclub.server.service.base;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +17,7 @@ public interface CrudService<DOMAIN,ID> {
     List<DOMAIN> listAll();
 
     @NonNull
-    Page<DOMAIN> listAll(@NonNull Pageable pageable);
+    IPage<DOMAIN> listAll(@NonNull IPage<DOMAIN> pageable);
 
     @NonNull
     List<DOMAIN> listAllByIds(@NonNull Collection<ID> ids);
@@ -47,7 +46,6 @@ public interface CrudService<DOMAIN,ID> {
     @NonNull
     List<DOMAIN> createInBatch(@NonNull Collection<DOMAIN> domains);
 
-    void flush();
 
     @Transactional
     @NonNull
@@ -70,19 +68,15 @@ public interface CrudService<DOMAIN,ID> {
     DOMAIN removeLogicById(@NonNull ID id);
 
     @Transactional
+    @NonNull
+    DOMAIN rollBackById(@NonNull ID id);
+
+    @Transactional
     @Nullable
     DOMAIN removeByIdOfNullable(@NonNull ID id);
 
     @Transactional
-    void remove(@NonNull DOMAIN domain);
-
-    @Transactional
     void removeInBatch(@NonNull Collection<ID> ids);
 
-    @Transactional
-    void removeAll(@NonNull Collection<DOMAIN> domains);
-
-    @Transactional
-    void removeAll();
 
 }

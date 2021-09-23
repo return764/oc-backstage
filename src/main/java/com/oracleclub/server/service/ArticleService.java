@@ -1,5 +1,6 @@
 package com.oracleclub.server.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oracleclub.server.entity.Article;
 import com.oracleclub.server.entity.enums.ArticleStatus;
 import com.oracleclub.server.entity.param.ArticleQueryParam;
@@ -7,8 +8,6 @@ import com.oracleclub.server.entity.vo.ArticleDetailVO;
 import com.oracleclub.server.entity.vo.ArticleSimpleVO;
 import com.oracleclub.server.service.base.ConverterService;
 import com.oracleclub.server.service.base.CrudService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,15 +26,15 @@ public interface ArticleService extends CrudService<Article,Long>, ConverterServ
 
     List<Article> listLatest(int top);
 
-    Page<Article> pageLatest(int top);
+    IPage<Article> pageLatest(int top);
 
-    Page<Article> pageBy(Pageable pageable);
+    IPage<Article> pageBy(IPage<Article> pageable);
 
-    Page<Article> pageBy(ArticleQueryParam queryParam, Pageable pageable);
+    IPage<Article> pageBy(ArticleQueryParam queryParam, IPage<Article> pageable);
 
     ArticleSimpleVO convertToSimple(Article article);
 
-    Page<ArticleSimpleVO> convertToSimplePage(Page<Article> articles);
+    IPage<ArticleSimpleVO> convertToSimplePage(IPage<Article> pageable);
 
     List<ArticleSimpleVO> convertToSimpleList(List<Article> articles);
 
