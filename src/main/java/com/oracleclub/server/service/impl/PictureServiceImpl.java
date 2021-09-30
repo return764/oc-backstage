@@ -11,12 +11,14 @@ import com.oracleclub.server.entity.param.PictureQueryParam;
 import com.oracleclub.server.entity.support.UploadFile;
 import com.oracleclub.server.entity.support.UploadResult;
 import com.oracleclub.server.entity.vo.PictureVO;
+import com.oracleclub.server.event.LogEvent;
 import com.oracleclub.server.handler.file.FileHandlers;
 import com.oracleclub.server.handler.file.support.PictureUpload;
 import com.oracleclub.server.service.PictureService;
 import com.oracleclub.server.service.base.AbstractCrudService;
 import com.oracleclub.server.utils.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,12 +39,14 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
     private final PictureMapper pictureMapper;
     private final FileHandlers fileHandlers;
     private final PictureUpload pictureUpload;
+    private final ApplicationEventPublisher eventPublisher;
 
-    protected PictureServiceImpl(PictureMapper pictureMapper, FileHandlers fileHandlers, PictureUpload pictureUpload) {
+    protected PictureServiceImpl(PictureMapper pictureMapper, FileHandlers fileHandlers, PictureUpload pictureUpload, ApplicationEventPublisher eventPublisher) {
         super(pictureMapper);
         this.pictureMapper = pictureMapper;
         this.fileHandlers = fileHandlers;
         this.pictureUpload = pictureUpload;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -112,6 +116,9 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
         picture.setUploadType(UploadFileType.LOCAL);
         picture.setUploadKey(upload.getFilePath());
 
+        LogEvent l = new LogEvent(this,"上传","上传图片:"+picture.getName());
+        eventPublisher.publishEvent(l);
+
         return create(picture);
     }
 
@@ -131,6 +138,9 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
     @Override
     public List<Picture> removePictures(List<Long> ids) {
         Assert.notEmpty(ids,"idList不能为空");
+
+        LogEvent l = new LogEvent(this,"删除","删除图片");
+        eventPublisher.publishEvent(l);
 
         return ids.stream().map(this::removePicture).collect(Collectors.toList());
     }

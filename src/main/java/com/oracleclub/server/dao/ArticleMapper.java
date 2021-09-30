@@ -37,5 +37,11 @@ public interface ArticleMapper extends BaseDao<Article,Long> {
 
     @Update("update articles a set a.status = #{status} where a.id = #{id}")
     int updateStatus(@Param("status") ArticleStatus status,@Param("id") Long id);
+
+    int getArticleCount();
+
+    int getViewCount();
+
+    int getLikeCount();
 }
 

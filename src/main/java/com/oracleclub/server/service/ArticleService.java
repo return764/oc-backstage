@@ -26,6 +26,8 @@ public interface ArticleService extends CrudService<Article,Long>, ConverterServ
 
     List<Article> listLatest(int top);
 
+    List<Article> listHot(int top);
+
     IPage<Article> pageLatest(int top);
 
     IPage<Article> pageBy(IPage<Article> pageable);

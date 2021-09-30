@@ -105,4 +105,7 @@
         u.id = #{u.id}
     </update>
 
+    <select id="getUserCount" resultType="Integer">
+        SELECT count(*) FROM users WHERE deleted_at IS NULL
+    </select>
 </mapper>

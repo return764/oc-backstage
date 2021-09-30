@@ -24,4 +24,6 @@ public interface UserMapper extends BaseDao<User,Long> {
     User findUserById(Long id);
 
     int updateUserInfoBy(@Param("u") User user);
+
+    int getUserCount();
 }

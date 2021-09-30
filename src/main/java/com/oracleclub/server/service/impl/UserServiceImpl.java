@@ -14,6 +14,7 @@ import com.oracleclub.server.entity.support.LoginToken;
 import com.oracleclub.server.entity.vo.AuthUserVO;
 import com.oracleclub.server.entity.vo.DepartmentVO;
 import com.oracleclub.server.entity.vo.UserVO;
+import com.oracleclub.server.event.LogEvent;
 import com.oracleclub.server.exception.LoginException;
 import com.oracleclub.server.exception.UserException;
 import com.oracleclub.server.exception.VerifyCodeException;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ehcache.Cache;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -52,6 +54,7 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
     private final Cache<String, String> verifyCodeCache;
     private final Cache<String, String> tokenCache;
     private Cache<String,String> refreshTokenCache;
+    private final ApplicationEventPublisher eventPublisher;
     private final JavaMailSender mailSender;
     @Value("${spring.mail.username}")
     String username;
@@ -63,7 +66,8 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
                               JavaMailSender mailSender,
                               @Qualifier("verifyCode") Cache<String, String> verifyCodeCache,
                               @Qualifier("refreshTokenCache") Cache<String, String> refreshTokenCache,
-                              Cache<String, String> tokenCache) {
+                              Cache<String, String> tokenCache,
+                              ApplicationEventPublisher eventPublisher) {
         super(userMapper);
         this.userMapper = userMapper;
         this.departmentMapper = departmentMapper;
@@ -71,6 +75,7 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         this.verifyCodeCache = verifyCodeCache;
         this.tokenCache = tokenCache;
         this.refreshTokenCache = refreshTokenCache;
+        this.eventPublisher = eventPublisher;
     }
 
 
@@ -120,6 +125,10 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
             log.debug("当前登录用户:[{}]",u);
             u.setLoginAt(LocalDateTime.now());
             userMapper.updateById(u);
+
+            LogEvent log = new LogEvent(this,"登录","验证码登录");
+            eventPublisher.publishEvent(log);
+
             return getAuthUser(u);
         }
         throw new VerifyCodeException("验证码错误");
@@ -135,6 +144,10 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         if(checkPassword(u,password)){
             u.setLoginAt(LocalDateTime.now());
             userMapper.updateById(u);
+
+            LogEvent log = new LogEvent(this,"登录","邮箱登录");
+            eventPublisher.publishEvent(log);
+
             return getAuthUser(u);
         }
         throw new LoginException("账号或密码错误");
@@ -147,6 +160,10 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         if(checkPassword(u,password)){
             u.setLoginAt(LocalDateTime.now());
             userMapper.updateById(u);
+
+            LogEvent log = new LogEvent(this,"登录","学号登录");
+            eventPublisher.publishEvent(log);
+
             return getAuthUser(u);
         }
         throw new LoginException("密码错误");
@@ -192,6 +209,10 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         user.setPassword(DigestUtil.md5Hex(user.getPassword()));
         userMapper.insert(user);
         User u = userMapper.findUserById(user.getId());
+
+        LogEvent log = new LogEvent(this,"注册","注册用户");
+        eventPublisher.publishEvent(log);
+
         return getAuthUser(u);
     }
 

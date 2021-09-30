@@ -8,12 +8,14 @@ import com.oracleclub.server.entity.param.AttachmentParam;
 import com.oracleclub.server.entity.support.UploadFile;
 import com.oracleclub.server.entity.support.UploadResult;
 import com.oracleclub.server.entity.vo.AttachmentVO;
+import com.oracleclub.server.event.LogEvent;
 import com.oracleclub.server.handler.file.FileHandlers;
 import com.oracleclub.server.handler.file.support.AttachmentUpload;
 import com.oracleclub.server.service.AttachmentService;
 import com.oracleclub.server.service.base.AbstractCrudService;
 import com.oracleclub.server.utils.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,12 +34,14 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
     private final AttachmentMapper attachmentMapper;
     private final FileHandlers fileHandlers;
     private final AttachmentUpload attachmentUpload;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public AttachmentServiceImpl(AttachmentMapper attachmentMapper, FileHandlers fileHandlers, AttachmentUpload attachmentUpload) {
+    public AttachmentServiceImpl(AttachmentMapper attachmentMapper, FileHandlers fileHandlers, AttachmentUpload attachmentUpload, ApplicationEventPublisher eventPublisher) {
         super(attachmentMapper);
         this.attachmentMapper = attachmentMapper;
         this.fileHandlers = fileHandlers;
         this.attachmentUpload = attachmentUpload;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -81,6 +85,9 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
         a.setSuffix(upload.getSuffix());
         a.setUploadType(UploadFileType.LOCAL);
 
+        LogEvent l = new LogEvent(this,"上传","上传附件:"+a.getName());
+        eventPublisher.publishEvent(l);
+
         log.debug("正在创建附件: [{}]",a);
 
         return create(a);
@@ -98,12 +105,18 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
         Assert.notEmpty(ids,"idList不能为空");
         ids.forEach(this::rollBackById);
 
+        LogEvent l = new LogEvent(this,"更新","恢复附件");
+        eventPublisher.publishEvent(l);
+
         return attachmentMapper.selectBatchIds(ids);
     }
 
     @Override
     public List<Attachment> removeAttachments(List<Long> ids) {
         Assert.notEmpty(ids,"idList不能为空");
+
+        LogEvent l = new LogEvent(this,"删除","删除附件");
+        eventPublisher.publishEvent(l);
 
         return ids.stream().map(this::removeAttachment).collect(Collectors.toList());
     }

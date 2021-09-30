@@ -1,7 +1,7 @@
 package com.oracleclub.server.dao;
 
 import com.oracleclub.server.dao.base.BaseDao;
-import com.oracleclub.server.entity.Article;
+import com.oracleclub.server.entity.OperationLog;
 
 /**
  * (OperationLogs)表数据库访问层
@@ -9,7 +9,7 @@ import com.oracleclub.server.entity.Article;
  * @author makejava
  * @since 2021-02-21 17:08:08
  */
-public interface OperationLogMapper extends BaseDao<Article,Long> {
+public interface OperationLogMapper extends BaseDao<OperationLog,Long> {
 
 }
 

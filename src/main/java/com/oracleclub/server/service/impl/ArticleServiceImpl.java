@@ -9,12 +9,14 @@ import com.oracleclub.server.entity.enums.ArticleStatus;
 import com.oracleclub.server.entity.param.ArticleQueryParam;
 import com.oracleclub.server.entity.vo.ArticleDetailVO;
 import com.oracleclub.server.entity.vo.ArticleSimpleVO;
+import com.oracleclub.server.event.LogEvent;
 import com.oracleclub.server.exception.NotFoundException;
 import com.oracleclub.server.exception.ServiceException;
 import com.oracleclub.server.service.ArticleService;
 import com.oracleclub.server.service.base.AbstractCrudService;
 import com.oracleclub.server.utils.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -35,10 +37,12 @@ import java.util.stream.Collectors;
 public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implements ArticleService {
 
     private final ArticleMapper articleMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
-    protected ArticleServiceImpl(ArticleMapper articleMapper) {
+    protected ArticleServiceImpl(ArticleMapper articleMapper, ApplicationEventPublisher eventPublisher) {
         super(articleMapper);
         this.articleMapper = articleMapper;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -64,6 +68,21 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
 
         Page<Article> pageRequest = new Page<>(0,top);
         return articleMapper.selectPage(pageRequest,getArticlePublishAndDESCWrapper()).getRecords();
+    }
+
+    @Override
+    public List<Article> listHot(int top) {
+        Assert.isTrue(top > 0,"Top number must not be less than 0");
+
+        Page<Article> pageRequest = new Page<>(0,top);
+        return articleMapper.selectPage(pageRequest,getArticlePublishAndDESCViewCountWrapper()).getRecords();
+    }
+
+    private QueryWrapper<Article> getArticlePublishAndDESCViewCountWrapper() {
+        QueryWrapper<Article> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("status",ArticleStatus.PUBLISHED)
+                .orderByDesc("view_count");
+        return queryWrapper;
     }
 
     private QueryWrapper<Article> getArticlePublishAndDESCWrapper() {
@@ -116,12 +135,20 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
 
     @Override
     public ArticleDetailVO createBy(Article article) {
+
+        LogEvent log = new LogEvent(this,"新建","创建新文章");
+        eventPublisher.publishEvent(log);
+
         return createOrUpdateBy(article);
     }
 
     @Override
     public ArticleDetailVO updateBy(Article article) {
         article.setUpdatedAt(LocalDateTime.now());
+
+        LogEvent log = new LogEvent(this,"更新","更新文章");
+        eventPublisher.publishEvent(log);
+
         return createOrUpdateBy(article);
     }
 
