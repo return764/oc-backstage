@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.oracleclub.server.entity.base.BaseEntity;
-import com.oracleclub.server.entity.enums.RoleEnum;
+import com.oracleclub.server.entity.enums.Role;
 import com.oracleclub.server.entity.enums.UserStatus;
 import lombok.Data;
 
@@ -44,7 +44,7 @@ public class User extends BaseEntity implements Serializable {
     private String avatar;
     private LocalDateTime birthday;
     private UserStatus status;
-    private RoleEnum role;
+    private Role role;
     private Long ipAddr;
     private LocalDateTime loginAt;
     @TableField(exist = false)

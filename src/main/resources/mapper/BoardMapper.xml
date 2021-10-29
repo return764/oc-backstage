@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.oracleclub.server.dao.BoardMapper">
+    <select id="findByRouterName" parameterType="String" resultType="Board">
+        SELECT * FROM
+        bbs_boards
+        WHERE
+        deleted_at IS NULL
+        AND router_name = #{boardRouterName}
+    </select>
+
+</mapper>

@@ -7,6 +7,7 @@ import com.oracleclub.server.entity.enums.PictureStatus;
 import com.oracleclub.server.entity.param.PictureQueryParam;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
  * @author RETURN
  * @since 2020-08-13 22:00:59
  */
+@Repository
 public interface PictureMapper extends BaseDao<Picture,Long> {
     List<Picture> findAllByStatus(@Param("status") PictureStatus status);
 

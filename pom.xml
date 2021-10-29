@@ -50,13 +50,14 @@
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
-            <artifactId>hutool-json</artifactId>
-            <version>5.3.10</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
             <artifactId>hutool-crypto</artifactId>
             <version>5.3.10</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.75</version>
         </dependency>
 
         <dependency>

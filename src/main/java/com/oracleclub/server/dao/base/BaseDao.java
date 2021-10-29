@@ -1,6 +1,7 @@
 package com.oracleclub.server.dao.base;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
  * @author : RETURN
  * @date : 2021/2/23 11:31
  */
+@Repository
 public interface BaseDao<DOMAIN,ID> extends BaseMapper<DOMAIN> {
 
     List<DOMAIN> insertInBatchById(Collection<ID> ids);

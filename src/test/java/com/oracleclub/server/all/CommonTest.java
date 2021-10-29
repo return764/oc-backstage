@@ -1,6 +1,6 @@
 package com.oracleclub.server.all;
 
-import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import com.oracleclub.server.entity.vo.R;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -35,7 +35,7 @@ public class CommonTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        R result = JSONUtil.toBean(respString, R.class);
+        R result = JSON.parseObject(respString, R.class);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(result.getMsg(),"pong");
     }

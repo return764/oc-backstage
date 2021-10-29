@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import java.util.Optional;
  * @author makejava
  * @since 2021-02-21 17:23:09
  */
+@Repository
 public interface ArticleMapper extends BaseDao<Article,Long> {
 
     @Update("update articles a set a.like_count = a.like_count + #{likes} where a.id = #{articleId}")

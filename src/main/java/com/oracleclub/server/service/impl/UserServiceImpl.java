@@ -6,7 +6,7 @@ import com.oracleclub.server.dao.DepartmentMapper;
 import com.oracleclub.server.dao.UserMapper;
 import com.oracleclub.server.entity.Department;
 import com.oracleclub.server.entity.User;
-import com.oracleclub.server.entity.enums.RoleEnum;
+import com.oracleclub.server.entity.enums.Role;
 import com.oracleclub.server.entity.enums.UserStatus;
 import com.oracleclub.server.entity.param.RegisterParam;
 import com.oracleclub.server.entity.param.UserQueryParam;
@@ -143,7 +143,7 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         }
         if(checkPassword(u,password)){
             u.setLoginAt(LocalDateTime.now());
-            userMapper.updateById(u);
+            userMapper.updateLoginTimeBy(u);
 
             LogEvent log = new LogEvent(this,"登录","邮箱登录");
             eventPublisher.publishEvent(log);
@@ -188,7 +188,7 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
     public AuthUserVO register(RegisterParam registerParam) {
         Assert.notNull(registerParam,"参数不能为空");
         User user = registerParam.convertTo();
-        user.setRole(RoleEnum.VISITOR);
+        user.setRole(Role.VISITOR);
         user.setStatus(UserStatus.NOT_ACTIVE);
         user.setLoginAt(LocalDateTime.now());
         //检查是否存在学号
