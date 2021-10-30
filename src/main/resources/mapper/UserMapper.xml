@@ -45,7 +45,7 @@
     <sql id="cols">
         u.id,nickname,u.name,stu_num,password,email,ph_num,info,avatar,birthday,status,ip_addr,login_at,
         u.created_at,u.updated_at,u.deleted_at,
-        dep_name,dep_alias_name,dep_content,
+        d.name as dep_name,d.alias_name as dep_alias_name,d.content dep_content,
         r.key as `role`
     </sql>
 

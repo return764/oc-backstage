@@ -14,6 +14,7 @@ public class Post extends BaseEntity {
     private String name;
     private String content;
     private Long issuerId;
+    private Long likeCount;
     private boolean canComment;
     private boolean isTop;
     private Long boardId;

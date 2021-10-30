@@ -1,6 +1,7 @@
 package com.oracleclub.server.entity.vo;
 
 import com.oracleclub.server.converter.OutputConverter;
+import com.oracleclub.server.entity.base.BaseEntity;
 import com.oracleclub.server.entity.bbs.Post;
 import lombok.Data;
 
@@ -9,5 +10,12 @@ import lombok.Data;
  * @date :2021/10/29 10:58
  */
 @Data
-public class PostVO implements OutputConverter<PostVO, Post> {
+public class PostVO extends BaseEntity implements OutputConverter<PostVO, Post> {
+    private String name;
+    private String content;
+    private SimpleUserVO issuer;
+    private Long likeCount;
+    private boolean canComment;
+    private boolean isTop;
+    private Long boardId;
 }

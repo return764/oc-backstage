@@ -5,6 +5,7 @@ import com.oracleclub.server.dao.BoardMapper;
 import com.oracleclub.server.dao.PostMapper;
 import com.oracleclub.server.entity.bbs.Board;
 import com.oracleclub.server.entity.bbs.Post;
+import com.oracleclub.server.entity.vo.PostVO;
 import com.oracleclub.server.entity.vo.SimplePostVO;
 import com.oracleclub.server.service.PostService;
 import com.oracleclub.server.service.base.AbstractCrudService;
@@ -44,5 +45,10 @@ public class PostServiceImpl extends AbstractCrudService<Post,Long> implements P
             return pageable.convert(post -> new SimplePostVO().convertFrom(post));
         }
         return postMapper.pageBy(pageable,board.getId());
+    }
+
+    @Override
+    public PostVO getHolePost(Long id) {
+        return postMapper.getById(id);
     }
 }

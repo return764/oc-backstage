@@ -7,4 +7,16 @@
         <result property="aliasName" column="dep_alias_name"/>
         <result property="content" column="dep_content"/>
     </resultMap>
+
+    <select id="getAllExist" resultMap="departmentMap">
+        SELECT
+        id,
+        name as dep_name,
+        alias_name as dep_alias_name,
+        content as dep_content
+        FROM
+        departments
+        WHERE
+        deleted_at IS NULL
+    </select>
 </mapper>

@@ -2,15 +2,17 @@ package com.oracleclub.server.controller.content;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oracleclub.server.entity.param.PageRequest;
+import com.oracleclub.server.entity.vo.PostVO;
 import com.oracleclub.server.entity.vo.SimplePostVO;
 import com.oracleclub.server.handler.page.PageDefault;
 import com.oracleclub.server.service.PostService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * @author :RETURN
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/content/posts")
 public class PostController {
 
-    @Autowired
+    @Resource
     PostService postService;
 
     @GetMapping("{boardName}")
@@ -28,6 +30,13 @@ public class PostController {
         Assert.hasText(boardName,"路由名不能为空");
 
         return postService.pageBy(boardName,pageable.convertTo());
+    }
+
+    @GetMapping
+    public PostVO getPost(Long id){
+        Assert.notNull(id,"id不能为空");
+
+        return postService.getHolePost(id);
     }
 
 }

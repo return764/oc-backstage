@@ -2,6 +2,7 @@ package com.oracleclub.server.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oracleclub.server.entity.bbs.Post;
+import com.oracleclub.server.entity.vo.PostVO;
 import com.oracleclub.server.entity.vo.SimplePostVO;
 import com.oracleclub.server.service.base.CrudService;
 
@@ -12,4 +13,5 @@ import com.oracleclub.server.service.base.CrudService;
 public interface PostService extends CrudService<Post, Long> {
     IPage<SimplePostVO> pageBy(String boardRouterName, IPage<Post> pageable);
 
+    PostVO getHolePost(Long id);
 }

@@ -18,6 +18,7 @@ public class SimplePostVO implements OutputConverter<SimplePostVO, Post> {
     private Long id;
     private String name;
     private SimpleUserVO issuer;
+    private Long likeCount;
     private boolean canComment;
     private boolean isTop;
     private Long boardId;
