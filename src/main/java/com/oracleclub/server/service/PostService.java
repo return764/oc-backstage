@@ -5,6 +5,7 @@ import com.oracleclub.server.entity.bbs.Post;
 import com.oracleclub.server.entity.vo.PostVO;
 import com.oracleclub.server.entity.vo.SimplePostVO;
 import com.oracleclub.server.service.base.CrudService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author :RETURN
@@ -14,4 +15,6 @@ public interface PostService extends CrudService<Post, Long> {
     IPage<SimplePostVO> pageBy(String boardRouterName, IPage<Post> pageable);
 
     PostVO getHolePost(Long id);
+
+    String upload(MultipartFile image);
 }

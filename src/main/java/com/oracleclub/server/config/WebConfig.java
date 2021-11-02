@@ -41,6 +41,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(tokenInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/upload/**")
+                .excludePathPatterns("/post/**")
                 .excludePathPatterns("/pictures/**")
                 .excludePathPatterns("/api/content/**");
     }
@@ -74,6 +75,10 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/pictures/**")
                 .setCacheControl(CacheControl.maxAge(7L, TimeUnit.DAYS))
                 .addResourceLocations(workDir + "pictures/");
+
+        registry.addResourceHandler("/post/**")
+                .setCacheControl(CacheControl.maxAge(7L, TimeUnit.DAYS))
+                .addResourceLocations(workDir + "post/");
     }
 
     @Bean
