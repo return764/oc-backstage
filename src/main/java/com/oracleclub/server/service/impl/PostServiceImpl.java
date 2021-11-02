@@ -6,6 +6,7 @@ import com.oracleclub.server.dao.PostMapper;
 import com.oracleclub.server.entity.bbs.Board;
 import com.oracleclub.server.entity.bbs.Post;
 import com.oracleclub.server.entity.enums.UploadFileType;
+import com.oracleclub.server.entity.param.PostParams;
 import com.oracleclub.server.entity.support.UploadResult;
 import com.oracleclub.server.entity.vo.PostVO;
 import com.oracleclub.server.entity.vo.SimplePostVO;
@@ -67,5 +68,24 @@ public class PostServiceImpl extends AbstractCrudService<Post,Long> implements P
         String uploadDir = postImageUpload.createUploadPath();
         UploadResult upload = fileHandlers.upload(image, UploadFileType.LOCAL,uploadDir);
         return ServiceUtils.changeFileSeparatorToUrlSeparator(upload.getFilePath());
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void createByParams(PostParams postParams) {
+        Post post = new Post();
+        Board board = boardMapper.findByName(postParams.getBoardName());
+
+        post.setName(postParams.getName());
+        post.setBoardId(board.getId());
+        post.setCanComment(true);
+        post.setIssuerId(postParams.getIssuerId());
+        post.setContent(postParams.getContent());
+        post.setLikeCount(0L);
+        post.setTop(false);
+        int i = postMapper.insert(post);
+        if (i < 1){
+            throw new RuntimeException("发帖失败");
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.oracleclub.server.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oracleclub.server.entity.bbs.Post;
+import com.oracleclub.server.entity.param.PostParams;
 import com.oracleclub.server.entity.vo.PostVO;
 import com.oracleclub.server.entity.vo.SimplePostVO;
 import com.oracleclub.server.service.base.CrudService;
@@ -17,4 +18,6 @@ public interface PostService extends CrudService<Post, Long> {
     PostVO getHolePost(Long id);
 
     String upload(MultipartFile image);
+
+    void createByParams(PostParams postParams);
 }

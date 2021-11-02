@@ -2,7 +2,9 @@ package com.oracleclub.server.controller.content;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oracleclub.server.entity.param.PageRequest;
+import com.oracleclub.server.entity.param.PostParams;
 import com.oracleclub.server.entity.vo.PostVO;
+import com.oracleclub.server.entity.vo.R;
 import com.oracleclub.server.entity.vo.SimplePostVO;
 import com.oracleclub.server.handler.page.PageDefault;
 import com.oracleclub.server.service.PostService;
@@ -44,8 +46,14 @@ public class PostController {
     public String imageUpload(@RequestParam("image") MultipartFile image){
         Assert.notNull(image,"上传文件不能为空");
         log.info("上传文件中:{}",image);
-        String name = postService.upload(image);
-        return name;
+        return postService.upload(image);
     }
 
+    @PostMapping
+    public R createPost(@RequestBody PostParams postParams) {
+        Assert.notNull(postParams,"post参数不能为空");
+
+        postService.createByParams(postParams);
+        return R.success("成功");
+    }
 }

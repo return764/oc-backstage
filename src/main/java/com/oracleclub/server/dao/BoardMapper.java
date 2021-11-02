@@ -12,4 +12,6 @@ import org.springframework.stereotype.Repository;
 public interface BoardMapper extends BaseDao<Board,Long> {
 
     Board findByRouterName(String boardRouterName);
+
+    Board findByName(String boardName);
 }

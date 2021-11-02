@@ -9,4 +9,12 @@
         AND router_name = #{boardRouterName}
     </select>
 
+    <select id="findByName" parameterType="String" resultType="Board">
+        SELECT * FROM
+        bbs_boards
+        WHERE
+        deleted_at IS NULL
+        AND name = #{boardName}
+    </select>
+
 </mapper>
