@@ -13,6 +13,7 @@ import com.oracleclub.server.entity.param.UserQueryParam;
 import com.oracleclub.server.entity.support.LoginToken;
 import com.oracleclub.server.entity.vo.AuthUserVO;
 import com.oracleclub.server.entity.vo.DepartmentVO;
+import com.oracleclub.server.entity.vo.SimpleUserVO;
 import com.oracleclub.server.entity.vo.UserVO;
 import com.oracleclub.server.event.LogEvent;
 import com.oracleclub.server.exception.LoginException;
@@ -228,6 +229,11 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         userMapper.updateUserInfoBy(user);
 
         return userMapper.selectById(user.getId());
+    }
+
+    @Override
+    public SimpleUserVO convertToSimpleVO(User user) {
+        return new SimpleUserVO().convertFrom(user);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.oracleclub.server.entity.User;
 import com.oracleclub.server.entity.param.RegisterParam;
 import com.oracleclub.server.entity.param.UserQueryParam;
 import com.oracleclub.server.entity.vo.AuthUserVO;
+import com.oracleclub.server.entity.vo.SimpleUserVO;
 import com.oracleclub.server.entity.vo.UserVO;
 import com.oracleclub.server.service.base.ConverterService;
 import com.oracleclub.server.service.base.CrudService;
@@ -79,4 +80,6 @@ public interface UserService extends CrudService<User,Long>, ConverterService<Us
     User getUserAndDepartment(Long id);
 
     User updateUserInfo(User user);
+
+    SimpleUserVO convertToSimpleVO(User user);
 }

@@ -12,7 +12,7 @@ import lombok.Data;
 @TableName("bbs_comments")
 public class Comment extends BaseEntity {
     private Long parentId;
-    private String issuerName;
+    private Long issuerId;
     private String content;
     private Long postId;
 }

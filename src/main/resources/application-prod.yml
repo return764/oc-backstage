@@ -4,7 +4,7 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://oc-db:3306/oracleclub?serverTimezone=GMT&characterEncoding=utf8
+    url: jdbc:mysql://oc-db:3306/oracleclub?serverTimezone=GMT%2B8&characterEncoding=utf8
     username: root
     password: ph18398858464
     type: com.alibaba.druid.pool.DruidDataSource

@@ -21,12 +21,21 @@
         <result property="updatedAt" column="updated_at"/>
         <result property="deletedAt" column="deleted_at"/>
 
-        <association property="department" javaType="Department" column="id">
-            <id property="id" column="id"/>
-            <result property="name" column="dep_name"/>
-            <result property="aliasName" column="dep_alias_name"/>
-            <result property="content" column="dep_content"/>
-        </association>
+        <association property="department" column="id"
+                     resultMap="com.oracleclub.server.dao.DepartmentMapper.departmentMap"/>
+    </resultMap>
+
+    <resultMap id="simpleUserMap" type="SimpleUserVO">
+        <id property="id" column="uid"/>
+        <result property="nickname" column="nickname"/>
+        <result property="name" column="uname"/>
+        <result property="stuNum" column="stu_num"/>
+        <result property="email" column="email"/>
+        <result property="info" column="info"/>
+        <result property="avatar" column="avatar"/>
+
+        <association property="department" column="id"
+                     resultMap="com.oracleclub.server.dao.DepartmentMapper.departmentVOMap"/>
     </resultMap>
 
     <sql id="base_table">
@@ -48,7 +57,6 @@
         d.name as dep_name,d.alias_name as dep_alias_name,d.content dep_content,
         r.key as `role`
     </sql>
-
 
     <select id="findAllExistWithParams" parameterType="UserQueryParam" resultMap="userMap">
         SELECT

@@ -8,6 +8,13 @@
         <result property="content" column="dep_content"/>
     </resultMap>
 
+    <resultMap id="departmentVOMap" type="DepartmentVO">
+        <id property="id" column="did"/>
+        <result property="name" column="dep_name"/>
+        <result property="aliasName" column="dep_alias_name"/>
+        <result property="content" column="dep_content"/>
+    </resultMap>
+
     <select id="getAllExist" resultMap="departmentMap">
         SELECT
         id,
