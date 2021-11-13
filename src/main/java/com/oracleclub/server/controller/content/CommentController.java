@@ -37,4 +37,11 @@ public class CommentController {
         commentService.createByParams(param);
         return R.success("ok");
     }
+
+    @GetMapping("count")
+    public Long count(Long postId) {
+        Assert.notNull(postId,"postId不能为空");
+
+        return commentService.countByPost(postId);
+    }
 }

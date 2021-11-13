@@ -76,4 +76,9 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         }
     }
 
+    @Override
+    public Long countByPost(Long postId) {
+        return commentMapper.count(postId);
+    }
+
 }

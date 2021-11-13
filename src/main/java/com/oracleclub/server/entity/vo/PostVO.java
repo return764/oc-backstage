@@ -1,5 +1,7 @@
 package com.oracleclub.server.entity.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.oracleclub.server.converter.OutputConverter;
 import com.oracleclub.server.entity.base.BaseEntity;
 import com.oracleclub.server.entity.bbs.Post;
@@ -17,5 +19,6 @@ public class PostVO extends BaseEntity implements OutputConverter<PostVO, Post> 
     private Long likeCount;
     private boolean canComment;
     private boolean isTop;
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long boardId;
 }

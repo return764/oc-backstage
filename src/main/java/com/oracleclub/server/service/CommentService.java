@@ -15,4 +15,6 @@ public interface CommentService extends CrudService<Comment, Long> {
     List<CommentVO> getAllCommentOfPostBy(Long postId);
 
     void createByParams(CommentParam param);
+
+    Long countByPost(Long postId);
 }
