@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.oracleclub.server.dao.CommentMapper;
 import com.oracleclub.server.dao.UserMapper;
 import com.oracleclub.server.entity.bbs.Comment;
+import com.oracleclub.server.entity.param.CommentParam;
 import com.oracleclub.server.entity.vo.CommentVO;
 import com.oracleclub.server.service.CommentService;
 import com.oracleclub.server.service.UserService;
@@ -63,6 +64,16 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         });
 
         return outerComments;
+    }
+
+    @Override
+    public void createByParams(CommentParam param) {
+        Comment comment = param.convertTo();
+
+        int i = commentMapper.insert(comment);
+        if (i < 1) {
+            throw new RuntimeException("评论失败");
+        }
     }
 
 }

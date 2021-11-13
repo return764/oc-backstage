@@ -1,12 +1,12 @@
 package com.oracleclub.server.controller.content;
 
+import com.oracleclub.server.entity.param.CommentParam;
 import com.oracleclub.server.entity.vo.CommentVO;
+import com.oracleclub.server.entity.vo.R;
 import com.oracleclub.server.service.CommentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -28,5 +28,13 @@ public class CommentController {
         Assert.notNull(postId,"postId不能为空");
 
         return commentService.getAllCommentOfPostBy(postId);
+    }
+
+    @PostMapping
+    public R publishComment(@RequestBody CommentParam param) {
+        Assert.notNull(param.getPostId(),"评论的post不能为空");
+
+        commentService.createByParams(param);
+        return R.success("ok");
     }
 }
