@@ -45,7 +45,6 @@ public class ArticleController {
         return articleService.convertToSimpleList(articleService.listHot(num));
     }
 
-    // todo page参数不能转换
     @GetMapping
     public IPage<ArticleSimpleVO> pageBy(@PageDefault PageRequest pageable){
         ArticleQueryParam params = new ArticleQueryParam();

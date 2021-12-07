@@ -1,8 +1,11 @@
 package com.oracleclub.server.controller.content;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oracleclub.server.entity.param.CommentParam;
+import com.oracleclub.server.entity.param.PageRequest;
 import com.oracleclub.server.entity.vo.CommentVO;
 import com.oracleclub.server.entity.vo.R;
+import com.oracleclub.server.handler.page.PageDefault;
 import com.oracleclub.server.service.CommentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
@@ -43,5 +46,12 @@ public class CommentController {
         Assert.notNull(postId,"postId不能为空");
 
         return commentService.countByPost(postId);
+    }
+
+    @GetMapping("reply")
+    public IPage<CommentVO> getReply(@PageDefault(size = 5) PageRequest pageable, Long commentId) {
+        Assert.notNull(commentId, "commentId不能为空");
+
+        return commentService.pageReply(pageable.convertTo(), commentId);
     }
 }

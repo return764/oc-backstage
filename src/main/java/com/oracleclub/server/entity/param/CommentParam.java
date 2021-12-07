@@ -10,6 +10,7 @@ import lombok.Data;
  */
 @Data
 public class CommentParam implements InputConverter<Comment> {
+    private Long rootId;
     private Long postId;
     private String content;
     private Long issuerId;

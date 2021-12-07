@@ -16,11 +16,14 @@ public class CommentVO {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     @JsonSerialize(using = ToStringSerializer.class)
+    private Long rootId;
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long parentId;
     private SimpleUserVO issuer;
     private String content;
     @JsonSerialize(using = ToStringSerializer.class)
     private Long postId;
+    private Long count;
     private LocalDateTime createdAt;
     private List<CommentVO> children;
 }

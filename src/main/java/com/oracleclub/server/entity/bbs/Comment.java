@@ -11,6 +11,7 @@ import lombok.Data;
 @Data
 @TableName("bbs_comments")
 public class Comment extends BaseEntity {
+    private Long rootId;
     private Long parentId;
     private Long issuerId;
     private String content;
