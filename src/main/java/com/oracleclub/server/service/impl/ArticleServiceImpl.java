@@ -192,15 +192,6 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
         return convertTo(article);
     }
 
-    @Override
-    public List<ArticleDetailVO> convertToListVO(List<Article> articles) {
-        return articles.stream().map(this::convertTo).collect(Collectors.toList());
-    }
-
-    @Override
-    public IPage<ArticleDetailVO> convertToPageVO(IPage<Article> articles){
-        return articles.convert(this::convertToVO);
-    }
 
     private ArticleDetailVO convertTo(Article article){
         Assert.notNull(article,"Article must not be null");

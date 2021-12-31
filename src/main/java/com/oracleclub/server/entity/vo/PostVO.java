@@ -7,6 +7,8 @@ import com.oracleclub.server.entity.base.BaseEntity;
 import com.oracleclub.server.entity.bbs.Post;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author :RETURN
  * @date :2021/10/29 10:58
@@ -21,4 +23,5 @@ public class PostVO extends BaseEntity implements OutputConverter<PostVO, Post> 
     private boolean isTop;
     @JsonSerialize(using = ToStringSerializer.class)
     private Long boardId;
+    private List<SimpleTagVO> tags;
 }

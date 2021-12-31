@@ -52,20 +52,6 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
     }
 
     @Override
-    public List<AttachmentVO> convertToListVO(List<Attachment> attachments) {
-        Assert.notNull(attachments,"待转换附件列表不能为空");
-
-        return attachments.stream().map(this::convertToVO).collect(Collectors.toList());
-    }
-
-    @Override
-    public IPage<AttachmentVO> convertToPageVO(IPage<Attachment> attachments) {
-        Assert.notNull(attachments,"待转换附件列表不能为空");
-
-        return attachments.convert(this::convertToVO);
-    }
-
-    @Override
     public Attachment upload(MultipartFile file) {
         Assert.notNull(file,"文件上传时不能为空");
         log.debug("开始上传文件... 类型:[{}]",file.getContentType());

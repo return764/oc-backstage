@@ -115,13 +115,4 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         return commentVO;
     }
 
-    @Override
-    public List<CommentVO> convertToListVO(List<Comment> comments) {
-        return comments.stream().map(this::convertToVO).collect(Collectors.toList());
-    }
-
-    @Override
-    public IPage<CommentVO> convertToPageVO(IPage<Comment> domains) {
-        return domains.convert(this::convertToVO);
-    }
 }

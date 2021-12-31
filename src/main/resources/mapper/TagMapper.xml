@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.oracleclub.server.dao.TagMapper">
+
+    <resultMap id="tagMap" type="Tag">
+        <id property="id" column="tid"/>
+        <result property="name" column="tname"/>
+        <result property="color" column="color"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="deletedAt" column="deleted_at"/>
+    </resultMap>
+
+    <resultMap id="simpleTag" type="SimpleTagVO">
+        <id property="id" column="tid"/>
+        <result property="name" column="tname"/>
+        <result property="color" column="color"/>
+    </resultMap>
+
+    <select id="selectSimpleByPostId" parameterType="Long" resultMap="simpleTag">
+        select
+        bt.id as tid,
+        `name`,
+        color
+        from bbs_tags bt
+        left join bbs_post_tag bp
+        on bt.id = bp.tag_id
+        where bp.post_id = #{id}
+    </select>
+</mapper>

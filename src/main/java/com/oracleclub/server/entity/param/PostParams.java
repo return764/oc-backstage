@@ -10,6 +10,7 @@ import lombok.Data;
 public class PostParams {
     private String name;
     private String content;
+    private String tags;
     private Long issuerId;
     private String boardName;
 }

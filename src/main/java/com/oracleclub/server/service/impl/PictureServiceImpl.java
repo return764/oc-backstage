@@ -54,17 +54,6 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
         return convertTo(picture);
     }
 
-    @Override
-    public List<PictureVO> convertToListVO(List<Picture> pictures) {
-        log.debug("{}",pictures);
-        return pictures.stream().map(this::convertTo).collect(Collectors.toList());
-    }
-
-    @Override
-    public IPage<PictureVO> convertToPageVO(IPage<Picture> pictures) {
-        return pictures.convert(this::convertTo);
-    }
-
     private PictureVO convertTo(Picture picture){
         Assert.notNull(picture,"图片不能为空");
 

@@ -2,7 +2,10 @@ package com.oracleclub.server.entity.bbs;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.oracleclub.server.entity.base.BaseEntity;
+import com.oracleclub.server.entity.vo.SimpleTagVO;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author :RETURN
@@ -18,4 +21,5 @@ public class Post extends BaseEntity {
     private boolean canComment;
     private boolean isTop;
     private Long boardId;
+    private List<SimpleTagVO> tags;
 }

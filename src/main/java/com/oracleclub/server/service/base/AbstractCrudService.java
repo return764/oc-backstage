@@ -1,5 +1,6 @@
 package com.oracleclub.server.service.base;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oracleclub.server.dao.base.BaseDao;
@@ -173,5 +174,11 @@ public abstract class AbstractCrudService<DOMAIN extends BaseEntity,ID extends S
         baseMapper.deleteBatchIds(ids);
     }
 
-
+    protected final Set<String> commaSeparatedStringToSet(String str) {
+        Set<String> result = new HashSet<>();
+        if (StrUtil.isNotEmpty(str)) {
+            result.addAll(Arrays.asList(str.split(",")));
+        }
+        return result;
+    }
 }

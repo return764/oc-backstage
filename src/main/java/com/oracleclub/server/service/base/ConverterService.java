@@ -3,6 +3,7 @@ package com.oracleclub.server.service.base;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author :RETURN
@@ -11,7 +12,11 @@ import java.util.List;
 public interface ConverterService<VO,DOMAIN> {
     VO convertToVO(DOMAIN domain);
 
-    List<VO> convertToListVO(List<DOMAIN> domains);
+    default List<VO> convertToListVO(List<DOMAIN> domains) {
+        return domains.stream().map(this::convertToVO).collect(Collectors.toList());
+    }
 
-    IPage<VO> convertToPageVO(IPage<DOMAIN> domains);
+    default IPage<VO> convertToPageVO(IPage<DOMAIN> domains) {
+        return domains.convert(this::convertToVO);
+    }
 }

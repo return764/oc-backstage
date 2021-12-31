@@ -37,8 +37,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * (User)表服务实现类
@@ -246,16 +244,6 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
             userVO.setDepartment(new DepartmentVO().convertFrom(department));
         }
         return userVO;
-    }
-
-    @Override
-    public List<UserVO> convertToListVO(List<User> users) {
-        return users.stream().map(this::convertToVO).collect(Collectors.toList());
-    }
-
-    @Override
-    public IPage<UserVO> convertToPageVO(IPage<User> users) {
-        return users.convert(this::convertToVO);
     }
 
     private AuthUserVO getAuthUser(User user) {

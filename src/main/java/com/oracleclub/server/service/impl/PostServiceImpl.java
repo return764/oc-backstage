@@ -3,6 +3,7 @@ package com.oracleclub.server.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oracleclub.server.dao.BoardMapper;
 import com.oracleclub.server.dao.PostMapper;
+import com.oracleclub.server.dao.TagMapper;
 import com.oracleclub.server.entity.bbs.Board;
 import com.oracleclub.server.entity.bbs.Post;
 import com.oracleclub.server.entity.enums.UploadFileType;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -31,13 +33,15 @@ public class PostServiceImpl extends AbstractCrudService<Post,Long> implements P
     private static final String HOME_ROUTER = "home";
     private final PostMapper postMapper;
     private final BoardMapper boardMapper;
+    private final TagMapper tagMapper;
     private final PostImageUpload postImageUpload;
     private final FileHandlers fileHandlers;
 
-    protected PostServiceImpl(PostMapper postMapper, BoardMapper boardMapper, PostImageUpload postImageUpload, FileHandlers fileHandlers) {
+    protected PostServiceImpl(PostMapper postMapper, BoardMapper boardMapper, TagMapper tagMapper, PostImageUpload postImageUpload, FileHandlers fileHandlers) {
         super(postMapper);
         this.postMapper = postMapper;
         this.boardMapper = boardMapper;
+        this.tagMapper = tagMapper;
         this.postImageUpload = postImageUpload;
         this.fileHandlers = fileHandlers;
     }
@@ -75,6 +79,7 @@ public class PostServiceImpl extends AbstractCrudService<Post,Long> implements P
     public void createByParams(PostParams postParams) {
         Post post = new Post();
         Board board = boardMapper.findByName(postParams.getBoardName());
+        Collection<String> tagIds = commaSeparatedStringToSet(postParams.getTags());
 
         post.setName(postParams.getName());
         post.setBoardId(board.getId());
