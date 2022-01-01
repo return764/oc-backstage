@@ -2,6 +2,7 @@ package com.oracleclub.server.dao;
 
 import com.oracleclub.server.dao.base.BaseDao;
 import com.oracleclub.server.entity.bbs.Tag;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,5 +13,5 @@ import java.util.List;
  */
 @Repository
 public interface TagMapper extends BaseDao<Tag, Long> {
-    List<Tag> selectSimpleByPostId(Long id);
+    List<Tag> selectSimpleByPostId(@Param("post_id") Long postId);
 }

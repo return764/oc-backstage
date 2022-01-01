@@ -17,14 +17,14 @@
         <result property="color" column="color"/>
     </resultMap>
 
-    <select id="selectSimpleByPostId" parameterType="Long" resultMap="simpleTag">
+    <select id="selectSimpleByPostId" resultMap="simpleTag">
         select
         bt.id as tid,
-        `name`,
+        `name` as tname,
         color
         from bbs_tags bt
         left join bbs_post_tag bp
         on bt.id = bp.tag_id
-        where bp.post_id = #{id}
+        where bp.post_id = #{post_id}
     </select>
 </mapper>

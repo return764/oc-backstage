@@ -14,7 +14,8 @@
         <association property="issuer" column="issuer_id"
                      resultMap="com.oracleclub.server.dao.UserMapper.simpleUserMap"/>
 
-        <collection property="tags" javaType="List" ofType="SimpleTagVO" resultMap="com.oracleclub.server.dao.TagMapper.simpleTag"/>
+        <collection property="tags" javaType="List" ofType="SimpleTagVO" column="{post_id=pid}"
+                    select="com.oracleclub.server.dao.TagMapper.selectSimpleByPostId"/>
 
     </resultMap>
 
@@ -31,7 +32,8 @@
         <association property="issuer" column="issuer_id"
                      resultMap="com.oracleclub.server.dao.UserMapper.simpleUserMap"/>
 
-        <collection property="tags" javaType="List" ofType="SimpleTagVO" resultMap="com.oracleclub.server.dao.TagMapper.simpleTag"/>
+        <collection property="tags" javaType="List" ofType="SimpleTagVO" column="{post_id=pid}"
+                    select="com.oracleclub.server.dao.TagMapper.selectSimpleByPostId"/>
     </resultMap>
 
     <sql id="simple">
@@ -52,10 +54,7 @@
         d.id as did,
         d.name as dep_name,
         d.alias_name as dep_alias_name,
-        d.content as dep_content,
-        bt.id as tid,
-        bt.name as tname,
-        bt.color
+        d.content as dep_content
     </sql>
 
     <select id="pageBy" parameterType="Long" resultMap="simplePostMap">
@@ -65,8 +64,6 @@
         bbs_posts p
         LEFT JOIN `users` u ON p.issuer_id = u.id
         LEFT JOIN departments d ON u.dep_id = d.id
-        LEFT JOIN bbs_post_tag bpt ON bpt.post_id = p.id
-        LEFT JOIN bbs_tags bt ON bpt.tag_id = bt.id
         WHERE
         p.deleted_at IS NULL
         AND u.deleted_at IS NULL
@@ -80,8 +77,6 @@
         bbs_posts p
         LEFT JOIN `users` u ON p.issuer_id = u.id
         LEFT JOIN departments d ON u.dep_id = d.id
-        LEFT JOIN bbs_post_tag bpt ON bpt.post_id = p.id
-        LEFT JOIN bbs_tags bt ON bpt.tag_id = bt.id
         WHERE
         p.deleted_at IS NULL
         AND u.deleted_at IS NULL
@@ -95,11 +90,17 @@
         bbs_posts p
         LEFT JOIN `users` u ON p.issuer_id = u.id
         LEFT JOIN departments d ON u.dep_id = d.id
-        LEFT JOIN bbs_post_tag bpt ON bpt.post_id = p.id
-        LEFT JOIN bbs_tags bt ON bpt.tag_id = bt.id
         WHERE
         p.deleted_at IS NULL
         AND u.deleted_at IS NULL
         AND p.id = #{id}
     </select>
+
+    <insert id="insertPostTagInBatch" parameterType="List">
+        insert into bbs_post_tag (post_id, tag_id)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.postId},#{item.tagId})
+        </foreach>
+    </insert>
 </mapper>
