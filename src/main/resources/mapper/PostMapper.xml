@@ -68,6 +68,7 @@
         p.deleted_at IS NULL
         AND u.deleted_at IS NULL
         AND p.board_id = #{b}
+        ORDER BY p.created_at desc
     </select>
 
     <select id="pageAllBy" resultMap="simplePostMap">
@@ -80,6 +81,7 @@
         WHERE
         p.deleted_at IS NULL
         AND u.deleted_at IS NULL
+        ORDER BY p.created_at desc
     </select>
 
     <select id="getById" parameterType="Long" resultMap="postMap">

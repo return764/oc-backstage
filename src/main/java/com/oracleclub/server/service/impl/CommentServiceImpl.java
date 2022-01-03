@@ -38,7 +38,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
     public List<CommentVO> getAllCommentOfPostBy(Long postId) {
         QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("post_id",postId);
-        queryWrapper.orderByAsc("created_at");
+        queryWrapper.orderByDesc("created_at");
         List<Comment> comments = commentMapper.selectList(queryWrapper);
         List<CommentVO> outerComments = new ArrayList<>();
         Map<Long, CommentVO> map = new HashMap<>(16);
