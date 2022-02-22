@@ -24,4 +24,6 @@ public interface PostMapper extends BaseDao<Post,Long> {
     PostVO getById(@Param("id") Long id);
 
     int insertPostTagInBatch(@Param("list") List<PostTagDTO> lstTag);
+
+    IPage<SimplePostVO> pageByIssuer(IPage<Post> pageRequest, @Param("userId") Long userId);
 }

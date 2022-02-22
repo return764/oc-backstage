@@ -1,5 +1,6 @@
 package com.oracleclub.server.utils;
 
+import cn.hutool.core.util.ReUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -77,5 +78,9 @@ public class JwtUtil {
         return new LoginToken(token,refreshToken);
     }
 
-
+    public static Long getUserId(String token) {
+        String tokenLast = ReUtil.get(BEARER_RE, token, 1);
+        Map<String, Claim> verifyToken = JwtUtil.verify(tokenLast);
+        return verifyToken.get("userId").asLong();
+    }
 }

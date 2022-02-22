@@ -96,6 +96,11 @@ public class PostServiceImpl extends AbstractCrudService<Post,Long> implements P
         }
     }
 
+    @Override
+    public IPage<SimplePostVO> pageOwnPost(Long userId, IPage<Post> pageRequest) {
+        return postMapper.pageByIssuer(pageRequest,userId);
+    }
+
     private void pushPostWithTags(Post post, Collection<String> tagIds) {
         if (tagIds.size() == 0) {
             return;

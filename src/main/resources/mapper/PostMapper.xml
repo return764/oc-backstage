@@ -84,6 +84,20 @@
         ORDER BY p.created_at desc
     </select>
 
+    <select id="pageByIssuer" parameterType="Long" resultMap="simplePostMap">
+        SELECT
+        <include refid="simple"></include>
+        FROM
+        bbs_posts p
+        LEFT JOIN `users` u ON p.issuer_id = u.id
+        LEFT JOIN departments d ON u.dep_id = d.id
+        WHERE
+        p.deleted_at IS NULL
+        AND u.deleted_at IS NULL
+        AND p.issuer_id = #{userId}
+        ORDER BY p.created_at desc
+    </select>
+
     <select id="getById" parameterType="Long" resultMap="postMap">
         SELECT
         p.content,

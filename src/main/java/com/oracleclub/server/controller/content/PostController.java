@@ -8,6 +8,7 @@ import com.oracleclub.server.entity.vo.R;
 import com.oracleclub.server.entity.vo.SimplePostVO;
 import com.oracleclub.server.handler.page.PageDefault;
 import com.oracleclub.server.service.PostService;
+import com.oracleclub.server.utils.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
@@ -40,6 +41,13 @@ public class PostController {
         Assert.notNull(id,"id不能为空");
 
         return postService.getHolePost(id);
+    }
+
+    @GetMapping("ownTopic")
+    public IPage<SimplePostVO> getOwnTopic(@PageDefault PageRequest pageable,@RequestHeader("Authorization")String token) {
+        Long userId = JwtUtil.getUserId(token);
+
+        return postService.pageOwnPost(userId, pageable.convertTo());
     }
 
     @PostMapping(value = "upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

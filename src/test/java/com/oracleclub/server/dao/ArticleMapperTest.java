@@ -1,14 +1,19 @@
 package com.oracleclub.server.dao;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.oracleclub.server.entity.Article;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -17,10 +22,13 @@ import java.util.List;
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
+@RunWith(SpringRunner.class)
+@Transactional
+@Rollback
 @SpringBootTest
 public class ArticleMapperTest {
 
-    @Autowired
+    @Resource
     ArticleMapper articleMapper;
 
     @Test
@@ -32,16 +40,18 @@ public class ArticleMapperTest {
 
     @Test
     public void testSelectOne() {
-        Article article = articleMapper.selectById(1426171475689345024L);
+        Article article = articleMapper.selectById(1468779978467446784L);
 
         Assertions.assertNotNull(article);
     }
 
     @Test
     public void testUpdate(){
-        Article article = articleMapper.selectById(1426171475689345024L);
+        Article article = articleMapper.selectById(1468779978467446784L);
         article.setAuthor("11111");
-        int i = articleMapper.update(article,null);
+        UpdateWrapper<Article> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", 1468779978467446784L);
+        int i = articleMapper.update(article,updateWrapper);
 
         Assertions.assertEquals(1,i);
     }

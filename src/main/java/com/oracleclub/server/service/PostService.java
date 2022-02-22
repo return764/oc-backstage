@@ -20,4 +20,6 @@ public interface PostService extends CrudService<Post, Long> {
     String upload(MultipartFile image);
 
     void createByParams(PostParams postParams);
+
+    IPage<SimplePostVO> pageOwnPost(Long userId, IPage<Post> pageRequest);
 }
