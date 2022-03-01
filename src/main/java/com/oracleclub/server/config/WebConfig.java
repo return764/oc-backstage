@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class WebConfig implements WebMvcConfigurer {
 
     private static final String FILE_PROTOCOL = "file:///";
+    public static final String TOKEN_NAME = "Authorization";
     @Resource
     TokenInterceptor tokenInterceptor;
     @Resource
@@ -43,7 +44,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/upload/**")
                 .excludePathPatterns("/post/**")
                 .excludePathPatterns("/pictures/**")
-                .excludePathPatterns("/api/content/**");
+                .excludePathPatterns("/api/content/**")
+                .excludePathPatterns("/**/error");
     }
 
     @Override

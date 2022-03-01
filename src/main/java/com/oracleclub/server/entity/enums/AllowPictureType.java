@@ -17,6 +17,7 @@ public enum AllowPictureType {
     //gif格式
     GIF("image/gif");
 
+
     private final String type;
 
     AllowPictureType(String type) {

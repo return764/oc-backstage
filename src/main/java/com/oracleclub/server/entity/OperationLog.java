@@ -17,9 +17,9 @@ import java.io.Serializable;
 public class OperationLog extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 184793492685024048L;
     /**
-     * 操作者
+     * 用户id
      */
-    private String name;
+    private Long userId;
     /**
      * 操作类型
      */

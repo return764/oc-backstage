@@ -1,14 +1,15 @@
 package com.oracleclub.server.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.oracleclub.server.annotation.OperationLogMarker;
 import com.oracleclub.server.dao.AttachmentMapper;
 import com.oracleclub.server.entity.Attachment;
+import com.oracleclub.server.entity.enums.OperationType;
 import com.oracleclub.server.entity.enums.UploadFileType;
 import com.oracleclub.server.entity.param.AttachmentParam;
 import com.oracleclub.server.entity.support.UploadFile;
 import com.oracleclub.server.entity.support.UploadResult;
 import com.oracleclub.server.entity.vo.AttachmentVO;
-import com.oracleclub.server.event.LogEvent;
 import com.oracleclub.server.handler.file.FileHandlers;
 import com.oracleclub.server.handler.file.support.AttachmentUpload;
 import com.oracleclub.server.service.AttachmentService;
@@ -65,6 +66,7 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
         return attachments.convert(this::convertToVO);
     }
 
+    @OperationLogMarker(operaType = OperationType.UPLOAD, operaContent = "上传附件")
     @Override
     public Attachment upload(MultipartFile file) {
         Assert.notNull(file,"文件上传时不能为空");
@@ -85,9 +87,6 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
         a.setSuffix(upload.getSuffix());
         a.setUploadType(UploadFileType.LOCAL);
 
-        LogEvent l = new LogEvent(this,"上传","上传附件:"+a.getName());
-        eventPublisher.publishEvent(l);
-
         log.debug("正在创建附件: [{}]",a);
 
         return create(a);
@@ -105,18 +104,12 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment,Long> 
         Assert.notEmpty(ids,"idList不能为空");
         ids.forEach(this::rollBackById);
 
-        LogEvent l = new LogEvent(this,"更新","恢复附件");
-        eventPublisher.publishEvent(l);
-
         return attachmentMapper.selectBatchIds(ids);
     }
 
     @Override
     public List<Attachment> removeAttachments(List<Long> ids) {
         Assert.notEmpty(ids,"idList不能为空");
-
-        LogEvent l = new LogEvent(this,"删除","删除附件");
-        eventPublisher.publishEvent(l);
 
         return ids.stream().map(this::removeAttachment).collect(Collectors.toList());
     }

@@ -15,7 +15,6 @@ import com.oracleclub.server.entity.vo.AuthUserVO;
 import com.oracleclub.server.entity.vo.DepartmentVO;
 import com.oracleclub.server.entity.vo.SimpleUserVO;
 import com.oracleclub.server.entity.vo.UserVO;
-import com.oracleclub.server.event.LogEvent;
 import com.oracleclub.server.exception.LoginException;
 import com.oracleclub.server.exception.UserException;
 import com.oracleclub.server.exception.VerifyCodeException;
@@ -127,9 +126,6 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
             u.setLoginAt(LocalDateTime.now());
             userMapper.updateById(u);
 
-            LogEvent log = new LogEvent(this,"登录","验证码登录");
-            eventPublisher.publishEvent(log);
-
             return getAuthUser(u);
         }
         throw new VerifyCodeException("验证码错误");
@@ -146,9 +142,6 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
             u.setLoginAt(LocalDateTime.now());
             userMapper.updateLoginTimeBy(u);
 
-            LogEvent log = new LogEvent(this,"登录","邮箱登录");
-            eventPublisher.publishEvent(log);
-
             return getAuthUser(u);
         }
         throw new LoginException("账号或密码错误");
@@ -161,9 +154,6 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         if(checkPassword(u,password)){
             u.setLoginAt(LocalDateTime.now());
             userMapper.updateById(u);
-
-            LogEvent log = new LogEvent(this,"登录","学号登录");
-            eventPublisher.publishEvent(log);
 
             return getAuthUser(u);
         }
@@ -210,9 +200,6 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         user.setPassword(DigestUtil.md5Hex(user.getPassword()));
         userMapper.insert(user);
         User u = userMapper.findUserById(user.getId());
-
-        LogEvent log = new LogEvent(this,"注册","注册用户");
-        eventPublisher.publishEvent(log);
 
         return getAuthUser(u);
     }

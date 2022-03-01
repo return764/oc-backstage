@@ -6,5 +6,5 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/oracleclub?serverTimezone=GMT%2b8&characterEncoding=utf8
     username: root
-    password: root
+    password: '@Mysql18398858464'
     type: com.alibaba.druid.pool.DruidDataSource

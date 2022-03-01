@@ -9,7 +9,10 @@ import com.oracleclub.server.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.ehcache.Cache;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -66,6 +69,7 @@ public class UserController {
         Assert.notNull(password, "密码不能为空");
 
         AuthUserVO userDetail = userService.loginEmail(email, password);
+        System.out.println(userDetail);
         return R.success("登录成功",userDetail);
     }
 

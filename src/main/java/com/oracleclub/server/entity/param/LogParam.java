@@ -14,8 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LogParam implements InputConverter<OperationLog> {
-
+    private Long userId;
     private String type;
     private String content;
-
 }

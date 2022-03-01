@@ -9,7 +9,6 @@ import com.oracleclub.server.entity.enums.ArticleStatus;
 import com.oracleclub.server.entity.param.ArticleQueryParam;
 import com.oracleclub.server.entity.vo.ArticleDetailVO;
 import com.oracleclub.server.entity.vo.ArticleSimpleVO;
-import com.oracleclub.server.event.LogEvent;
 import com.oracleclub.server.exception.NotFoundException;
 import com.oracleclub.server.exception.ServiceException;
 import com.oracleclub.server.service.ArticleService;
@@ -136,18 +135,12 @@ public class ArticleServiceImpl extends AbstractCrudService<Article,Long> implem
     @Override
     public ArticleDetailVO createBy(Article article) {
 
-        LogEvent log = new LogEvent(this,"新建","创建新文章");
-        eventPublisher.publishEvent(log);
-
         return createOrUpdateBy(article);
     }
 
     @Override
     public ArticleDetailVO updateBy(Article article) {
         article.setUpdatedAt(LocalDateTime.now());
-
-        LogEvent log = new LogEvent(this,"更新","更新文章");
-        eventPublisher.publishEvent(log);
 
         return createOrUpdateBy(article);
     }

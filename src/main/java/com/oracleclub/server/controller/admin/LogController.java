@@ -25,11 +25,11 @@ public class LogController {
     @GetMapping("latest")
     public R listLatest(@RequestParam(name = "top",defaultValue = "10")int top){
 
-        return R.success("成功获取最新日志",logService.listLatest(top));
+        return R.success("成功获取最新日志",logService.convertToListVO(logService.listLatest(top)));
     }
 
     @GetMapping
     public R pageBy(@PageDefault PageRequest pageable){
-        return R.success("成功获取日志列表",logService.pageBy(pageable.convertTo()));
+        return R.success("成功获取日志列表",logService.convertToPageVO(logService.pageBy(pageable.convertTo())));
     }
 }

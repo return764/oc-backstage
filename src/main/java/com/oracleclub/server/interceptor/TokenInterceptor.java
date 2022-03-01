@@ -1,8 +1,7 @@
 package com.oracleclub.server.interceptor;
 
-import cn.hutool.core.util.ReUtil;
-import com.auth0.jwt.interfaces.Claim;
 import com.oracleclub.server.annotation.PassToken;
+import com.oracleclub.server.config.WebConfig;
 import com.oracleclub.server.exception.AuthenticationException;
 import com.oracleclub.server.exception.TokenPastDateException;
 import com.oracleclub.server.utils.JwtUtil;
@@ -16,9 +15,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
-
-import static com.oracleclub.server.utils.JwtUtil.BEARER_RE;
 
 /**
  * token拦截器，拦截所有请求
@@ -29,8 +25,6 @@ import static com.oracleclub.server.utils.JwtUtil.BEARER_RE;
 @Component
 @Slf4j
 public class TokenInterceptor implements HandlerInterceptor {
-
-    private static final String TOKEN_NAME = "Authorization";
 
     @Resource(name = "tokenCache")
     private Cache<String, String> tokenCache;
@@ -51,27 +45,21 @@ public class TokenInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        String token = request.getHeader(TOKEN_NAME);
-        if (null == token){
-            throw new AuthenticationException("无token,请重新登录");
-        }
-
-        token = ReUtil.get(BEARER_RE, token, 1);
-        if (null == token){
+        String sourceToken = request.getHeader(WebConfig.TOKEN_NAME);
+        String realToken = JwtUtil.getRealToken(sourceToken);
+        if (null == realToken){
             throw new AuthenticationException("token格式错误，请重新登录");
         }
 
-        //验证token
-        Map<String, Claim> verify = JwtUtil.verify(token);
-        String userId = verify.get("userId").asString();
+        String userId = JwtUtil.getUserId(sourceToken);
         String cacheToken = tokenCache.get(userId);
         request.setAttribute("userId",userId);
 
         log.debug("cacheToken:{}",cacheToken);
-        log.debug("token:{}",token);
+        log.debug("token:{}",realToken);
 
         //缓存中存在，并且与传递过来的token不相同
-        if (null != cacheToken &&!token.equals(cacheToken)){
+        if (null != cacheToken &&!realToken.equals(cacheToken)){
             throw new AuthenticationException("token不匹配");
         }
 

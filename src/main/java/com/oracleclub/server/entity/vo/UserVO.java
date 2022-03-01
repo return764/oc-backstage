@@ -2,7 +2,6 @@ package com.oracleclub.server.entity.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.oracleclub.server.converter.InputConverter;
 import com.oracleclub.server.converter.OutputConverter;
 import com.oracleclub.server.entity.User;
 import com.oracleclub.server.entity.enums.Role;
@@ -16,7 +15,7 @@ import java.time.LocalDateTime;
  * @date 2020/10/1 22:44
  */
 @Data
-public class UserVO implements OutputConverter<UserVO, User>, InputConverter<User> {
+public class UserVO implements OutputConverter<UserVO, User> {
 
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
