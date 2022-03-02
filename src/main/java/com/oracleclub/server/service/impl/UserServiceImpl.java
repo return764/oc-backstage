@@ -198,7 +198,8 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         }
         //加密密码
         user.setPassword(DigestUtil.md5Hex(user.getPassword()));
-        userMapper.insert(user);
+        userMapper.insertUser(user);
+        userMapper.insertUserRole(user.getId(), user.getRole());
         User u = userMapper.findUserById(user.getId());
 
         return getAuthUser(u);
