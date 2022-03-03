@@ -44,6 +44,7 @@ public class User extends BaseEntity implements Serializable {
     private String avatar;
     private LocalDateTime birthday;
     private UserStatus status;
+    @TableField(exist = false)
     private Role role;
     private Long ipAddr;
     private LocalDateTime loginAt;

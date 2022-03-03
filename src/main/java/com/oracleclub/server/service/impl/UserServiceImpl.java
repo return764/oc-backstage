@@ -120,6 +120,7 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
     public AuthUserVO loginVerify(String email, String verifyCode) {
         log.debug("邮箱验证码登录开始");
         String matchVerifyCode = verifyCodeCache.get(email);
+        log.debug("带匹配的验证码：{}", matchVerifyCode);
         if (verifyCode.equals(matchVerifyCode)) {
             User u = userMapper.findByEmail(email);
             log.debug("当前登录用户:[{}]",u);

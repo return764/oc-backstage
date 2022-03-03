@@ -3,16 +3,14 @@ package com.oracleclub.server.controller;
 import com.oracleclub.server.annotation.PassToken;
 import com.oracleclub.server.entity.param.LoginParam;
 import com.oracleclub.server.entity.param.RegisterParam;
+import com.oracleclub.server.entity.param.VerifyCodeLoginParam;
 import com.oracleclub.server.entity.vo.AuthUserVO;
 import com.oracleclub.server.entity.vo.R;
 import com.oracleclub.server.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.ehcache.Cache;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -47,7 +45,9 @@ public class UserController {
 
     @PostMapping("login/verify")
     @PassToken
-    public R loginVerify(String email, String verifyCode) {
+    public R loginVerify(@RequestBody @Valid VerifyCodeLoginParam param) {
+        String email = param.getEmail();
+        String verifyCode = param.getVerifyCode();
         log.debug("邮箱:{},验证码:{}", email, verifyCode);
         Assert.notNull(email, "用户邮箱不能为空");
         Assert.notNull(verifyCode, "验证码不能为空");
