@@ -61,6 +61,21 @@
         p.deleted_at IS NULL
         AND u.deleted_at IS NULL
         AND p.board_id = #{b}
+        order by p.id desc
+    </select>
+
+    <select id="pageByUserId" parameterType="Long" resultMap="simplePostMap">
+        SELECT
+        <include refid="simple"></include>
+        FROM
+        bbs_posts p
+        LEFT JOIN `users` u ON p.issuer_id = u.id
+        LEFT JOIN departments d ON u.dep_id = d.id
+        WHERE
+        p.deleted_at IS NULL
+        AND u.deleted_at IS NULL
+        AND p.issuer_id = #{uid}
+        order by p.id desc
     </select>
 
     <select id="pageAllBy" resultMap="simplePostMap">
@@ -73,6 +88,7 @@
         WHERE
         p.deleted_at IS NULL
         AND u.deleted_at IS NULL
+        order by p.id desc
     </select>
 
     <select id="getById" parameterType="Long" resultMap="postMap">

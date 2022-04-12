@@ -113,7 +113,6 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         } catch (MessagingException e) {
             throw new VerifyCodeException("验证码发送失败");
         }
-
     }
 
     @Override

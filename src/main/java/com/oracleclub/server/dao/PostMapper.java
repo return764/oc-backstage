@@ -19,4 +19,6 @@ public interface PostMapper extends BaseDao<Post,Long> {
     IPage<SimplePostVO> pageAllBy(IPage<Post> pageable);
 
     PostVO getById(@Param("id") Long id);
+
+    IPage<SimplePostVO> pageByUserId(IPage<Post> pageable,@Param("uid") Long userId);
 }

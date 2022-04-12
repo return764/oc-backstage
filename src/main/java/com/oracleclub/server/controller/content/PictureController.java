@@ -1,6 +1,7 @@
 package com.oracleclub.server.controller.content;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.oracleclub.server.annotation.PassToken;
 import com.oracleclub.server.entity.param.PageRequest;
 import com.oracleclub.server.entity.param.PictureQueryParam;
 import com.oracleclub.server.entity.vo.PictureVO;
@@ -24,6 +25,7 @@ public class PictureController {
     @Resource
     private PictureService pictureService;
 
+    @PassToken
     @GetMapping
     public IPage<PictureVO> listPicture(@PageDefault PageRequest pageable,
                                         PictureQueryParam pictureQueryParam) {

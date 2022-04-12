@@ -97,6 +97,7 @@ public class AttachmentController {
     }
 
     @PostMapping("uploads")
+    @CrossOrigin
     public R uploads(@RequestParam("files")MultipartFile[] files){
         List<Attachment> list = new LinkedList<>();
         for (MultipartFile file : files) {

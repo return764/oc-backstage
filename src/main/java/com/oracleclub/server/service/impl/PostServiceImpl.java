@@ -8,10 +8,12 @@ import com.oracleclub.server.entity.bbs.Post;
 import com.oracleclub.server.entity.enums.UploadFileType;
 import com.oracleclub.server.entity.param.PostParams;
 import com.oracleclub.server.entity.support.UploadResult;
+import com.oracleclub.server.entity.vo.CommentVO;
 import com.oracleclub.server.entity.vo.PostVO;
 import com.oracleclub.server.entity.vo.SimplePostVO;
 import com.oracleclub.server.handler.file.FileHandlers;
 import com.oracleclub.server.handler.file.support.PostImageUpload;
+import com.oracleclub.server.service.CommentService;
 import com.oracleclub.server.service.PostService;
 import com.oracleclub.server.service.base.AbstractCrudService;
 import com.oracleclub.server.utils.ServiceUtils;
@@ -19,7 +21,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 /**
  * @author :RETURN
@@ -33,13 +39,15 @@ public class PostServiceImpl extends AbstractCrudService<Post,Long> implements P
     private final BoardMapper boardMapper;
     private final PostImageUpload postImageUpload;
     private final FileHandlers fileHandlers;
+    private final CommentService commentService;
 
-    protected PostServiceImpl(PostMapper postMapper, BoardMapper boardMapper, PostImageUpload postImageUpload, FileHandlers fileHandlers) {
+    protected PostServiceImpl(PostMapper postMapper, BoardMapper boardMapper, PostImageUpload postImageUpload, FileHandlers fileHandlers, CommentService commentService) {
         super(postMapper);
         this.postMapper = postMapper;
         this.boardMapper = boardMapper;
         this.postImageUpload = postImageUpload;
         this.fileHandlers = fileHandlers;
+        this.commentService = commentService;
     }
 
     @Override
@@ -87,5 +95,21 @@ public class PostServiceImpl extends AbstractCrudService<Post,Long> implements P
         if (i < 1){
             throw new RuntimeException("发帖失败");
         }
+    }
+
+    @Override
+    public IPage<SimplePostVO> pageByUserId(Long userId, IPage<Post> pageRequest) {
+
+        return postMapper.pageByUserId(pageRequest, userId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        Post post = getByIdExist(id);
+
+        post.setDeletedAt(LocalDateTime.now());
+        this.update(post);
+        commentService.deleteByPostId(post.getId());
     }
 }

@@ -1,13 +1,15 @@
 package com.oracleclub.server.interceptor;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import com.oracleclub.server.annotation.PassToken;
 import com.oracleclub.server.config.WebConfig;
 import com.oracleclub.server.exception.AuthenticationException;
 import com.oracleclub.server.exception.TokenPastDateException;
+import com.oracleclub.server.service.UserService;
 import com.oracleclub.server.utils.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ehcache.Cache;
-import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -29,6 +31,10 @@ public class TokenInterceptor implements HandlerInterceptor {
     @Resource(name = "tokenCache")
     private Cache<String, String> tokenCache;
 
+    @Lazy
+    @Resource
+    private UserService userService;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //如果该url没有进入controller的方法
@@ -36,14 +42,15 @@ public class TokenInterceptor implements HandlerInterceptor {
             return true;
         }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
-
-        if(handlerMethod.getBeanType() == BasicErrorController.class){
-            throw new RuntimeException("未知错误");
+        Class<?> declaringClass = handlerMethod.getMethod().getDeclaringClass();
+        if (AnnotationUtil.hasAnnotation(declaringClass, PassToken.class)) {
+            return true;
         }
         //如果有不需要验证token的注解
         if (handlerMethod.hasMethodAnnotation(PassToken.class)){
             return true;
         }
+
 
         String sourceToken = request.getHeader(WebConfig.TOKEN_NAME);
         String realToken = JwtUtil.getRealToken(sourceToken);
@@ -54,6 +61,7 @@ public class TokenInterceptor implements HandlerInterceptor {
         String userId = JwtUtil.getUserId(sourceToken);
         String cacheToken = tokenCache.get(userId);
         request.setAttribute("userId",userId);
+        request.setAttribute("user", userService.getUserAndDepartment(Long.valueOf(userId)));
 
         log.debug("cacheToken:{}",cacheToken);
         log.debug("token:{}",realToken);

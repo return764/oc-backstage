@@ -1,5 +1,6 @@
 package com.oracleclub.server.controller.content;
 
+import com.oracleclub.server.annotation.PassToken;
 import com.oracleclub.server.entity.bbs.Board;
 import com.oracleclub.server.entity.support.Route;
 import com.oracleclub.server.service.BoardService;
@@ -14,6 +15,7 @@ import java.util.List;
  * @author :RETURN
  * @date :2021/10/10 23:09
  */
+@PassToken
 @RestController("content_board_controller")
 @RequestMapping("api/content/boards")
 public class BoardController {

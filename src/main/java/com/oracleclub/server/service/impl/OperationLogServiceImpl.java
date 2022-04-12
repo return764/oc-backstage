@@ -4,11 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.oracleclub.server.dao.OperationLogMapper;
-import com.oracleclub.server.dao.UserMapper;
 import com.oracleclub.server.entity.OperationLog;
 import com.oracleclub.server.entity.vo.OperationLogVO;
 import com.oracleclub.server.entity.vo.SimpleUserVO;
 import com.oracleclub.server.service.OperationLogService;
+import com.oracleclub.server.service.UserService;
 import com.oracleclub.server.service.base.AbstractCrudService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -24,12 +24,12 @@ import java.util.stream.Collectors;
 public class OperationLogServiceImpl extends AbstractCrudService<OperationLog,Long> implements OperationLogService {
 
     private final OperationLogMapper logMapper;
-    private final UserMapper userMapper;
+    private final UserService userService;
 
-    protected OperationLogServiceImpl(OperationLogMapper logMapper, UserMapper userMapper) {
+    protected OperationLogServiceImpl(OperationLogMapper logMapper, UserService userService) {
         super(logMapper);
         this.logMapper = logMapper;
-        this.userMapper = userMapper;
+        this.userService = userService;
     }
 
     @Override
@@ -58,7 +58,7 @@ public class OperationLogServiceImpl extends AbstractCrudService<OperationLog,Lo
         Assert.notNull(operationLog, "日志不存在");
 
         OperationLogVO operationLogVO = new OperationLogVO().convertFrom(operationLog);
-        operationLogVO.setUser(new SimpleUserVO().convertFrom(userMapper.findUserById(operationLog.getUserId())));
+        operationLogVO.setUser(new SimpleUserVO().convertFrom(userService.getUserAndDepartment(operationLog.getUserId())));
         return operationLogVO;
     }
 

@@ -16,4 +16,6 @@ public interface CommentMapper extends BaseDao<Comment, Long> {
     Long count(Long postId);
 
     IPage<Comment> pageReplyInComment(IPage<Comment> pageable, @Param("commentId") Long commentId);
+
+    IPage<Comment> pageReplyMeReplyByIssuerId(IPage<Comment> convertTo, @Param("issuerId") Long id);
 }

@@ -1,6 +1,7 @@
 package com.oracleclub.server.controller.content;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.oracleclub.server.annotation.PassToken;
 import com.oracleclub.server.entity.param.PageRequest;
 import com.oracleclub.server.entity.param.PostParams;
 import com.oracleclub.server.entity.vo.PostVO;
@@ -21,6 +22,7 @@ import javax.annotation.Resource;
  * @date :2021/10/10 23:09
  */
 @Slf4j
+@PassToken
 @RestController("content_post_controller")
 @RequestMapping("api/content/posts")
 public class PostController {
@@ -55,5 +57,13 @@ public class PostController {
 
         postService.createByParams(postParams);
         return R.success("成功");
+    }
+
+    @PostMapping("delete")
+    public R delete(Long id) {
+        Assert.notNull(id,"id不能为空");
+
+        postService.deleteById(id);
+        return R.success("ok");
     }
 }

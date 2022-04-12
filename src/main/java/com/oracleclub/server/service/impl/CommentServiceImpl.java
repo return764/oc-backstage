@@ -8,12 +8,15 @@ import com.oracleclub.server.entity.base.BaseEntity;
 import com.oracleclub.server.entity.bbs.Comment;
 import com.oracleclub.server.entity.param.CommentParam;
 import com.oracleclub.server.entity.vo.CommentVO;
+import com.oracleclub.server.entity.vo.ReplyMeReplyVO;
 import com.oracleclub.server.service.CommentService;
 import com.oracleclub.server.service.UserService;
 import com.oracleclub.server.service.base.AbstractCrudService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -36,10 +39,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
 
     @Override
     public List<CommentVO> getAllCommentOfPostBy(Long postId) {
-        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("post_id",postId);
-        queryWrapper.orderByAsc("created_at");
-        List<Comment> comments = commentMapper.selectList(queryWrapper);
+        List<Comment> comments = getAllByPostId(postId);
         List<CommentVO> outerComments = new ArrayList<>();
         Map<Long, CommentVO> map = new HashMap<>(16);
 
@@ -76,6 +76,14 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         return checkAndSplit(outerComments);
     }
 
+    @Override
+    public List<Comment> getAllByPostId(Long postId) {
+        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("post_id", postId);
+        queryWrapper.orderByAsc("created_at");
+        return commentMapper.selectList(queryWrapper);
+    }
+
     private List<CommentVO> checkAndSplit(List<CommentVO> comments) {
 
         return comments;
@@ -100,6 +108,37 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
     public IPage<CommentVO> pageReply(IPage<Comment> pageable, Long commentId) {
         IPage<Comment> comments = commentMapper.pageReplyInComment(pageable, commentId);
         return this.convertToPageVO(comments);
+    }
+
+    @Override
+    public IPage<ReplyMeReplyVO> pageReplyMeReplyByUserId(IPage<Comment> convertTo, Long id) {
+        IPage<Comment> replyPage = commentMapper.pageReplyMeReplyByIssuerId(convertTo, id);
+
+
+        IPage<CommentVO> commentVOs = convertToPageVO(replyPage);
+        Map<Long, Comment> commentMap = commentVOs.getRecords().stream()
+                .map(CommentVO::getParentId)
+                .distinct()
+                .map(this::getByIdExist)
+                .collect(Collectors.toMap(Comment::getId, Function.identity()));
+
+
+        IPage<ReplyMeReplyVO> page = commentVOs.convert(comment -> {
+            ReplyMeReplyVO replyVO = new ReplyMeReplyVO();
+            replyVO.setRmr(comment);
+            replyVO.setSourceContent(commentMap.get(comment.getParentId()).getContent());
+            return replyVO;
+        });
+
+        return page;
+    }
+
+    @Override
+    public void deleteByPostId(Long postId) {
+        List<Comment> commentsByPost = getAllByPostId(postId);
+        commentsByPost = commentsByPost.stream().peek(comment -> comment.setDeletedAt(LocalDateTime.now())).collect(Collectors.toList());
+
+        updateInBatch(commentsByPost);
     }
 
     @Override
