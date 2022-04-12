@@ -3,15 +3,16 @@ package com.oracleclub.server.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.oracleclub.server.annotation.OperationLogMarker;
 import com.oracleclub.server.dao.PictureMapper;
 import com.oracleclub.server.entity.Picture;
+import com.oracleclub.server.entity.enums.OperationType;
 import com.oracleclub.server.entity.enums.PictureStatus;
 import com.oracleclub.server.entity.enums.UploadFileType;
 import com.oracleclub.server.entity.param.PictureQueryParam;
 import com.oracleclub.server.entity.support.UploadFile;
 import com.oracleclub.server.entity.support.UploadResult;
 import com.oracleclub.server.entity.vo.PictureVO;
-import com.oracleclub.server.event.LogEvent;
 import com.oracleclub.server.handler.file.FileHandlers;
 import com.oracleclub.server.handler.file.support.PictureUpload;
 import com.oracleclub.server.service.PictureService;
@@ -85,6 +86,7 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
         return convertToVO(update(picture));
     }
 
+    @OperationLogMarker(operaType = OperationType.UPLOAD, operaContent = "上传图片")
     @Override
     public Picture upload(MultipartFile file,String type) {
         Assert.notNull(file,"上传图片不能为空");
@@ -105,9 +107,6 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
         picture.setUploadType(UploadFileType.LOCAL);
         picture.setUploadKey(upload.getFilePath());
 
-        LogEvent l = new LogEvent(this,"上传","上传图片:"+picture.getName());
-        eventPublisher.publishEvent(l);
-
         return create(picture);
     }
 
@@ -124,12 +123,10 @@ public class PictureServiceImpl extends AbstractCrudService<Picture,Long> implem
         return convertToPageVO(all);
     }
 
+    @OperationLogMarker(operaType = OperationType.DELETE, operaContent = "彻底删除图片")
     @Override
     public List<Picture> removePictures(List<Long> ids) {
         Assert.notEmpty(ids,"idList不能为空");
-
-        LogEvent l = new LogEvent(this,"删除","删除图片");
-        eventPublisher.publishEvent(l);
 
         return ids.stream().map(this::removePicture).collect(Collectors.toList());
     }

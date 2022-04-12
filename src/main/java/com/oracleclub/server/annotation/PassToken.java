@@ -11,6 +11,6 @@ import java.lang.annotation.Target;
  * @date 2020/8/13 23:10
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE})
 public @interface PassToken {
 }

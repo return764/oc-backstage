@@ -31,7 +31,7 @@ public class BoardServiceImpl extends AbstractCrudService<Board,Long> implements
         return boards.stream().map(board -> {
             Route r = new Route();
             r.setPath(board.getRouterName());
-            r.setComponent("/bbs/BBSList");
+            r.setComponent("/bbs/MainPostList");
             r.setName(board.getName());
             r.setMeta(Route.RouteMeta.builder()
                     .name(board.getName())

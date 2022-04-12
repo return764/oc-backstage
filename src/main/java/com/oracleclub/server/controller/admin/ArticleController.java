@@ -1,8 +1,10 @@
 package com.oracleclub.server.controller.admin;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.oracleclub.server.annotation.OperationLogMarker;
 import com.oracleclub.server.entity.Article;
 import com.oracleclub.server.entity.enums.ArticleStatus;
+import com.oracleclub.server.entity.enums.OperationType;
 import com.oracleclub.server.entity.param.ArticleParam;
 import com.oracleclub.server.entity.param.ArticleQueryParam;
 import com.oracleclub.server.entity.param.PageRequest;
@@ -53,6 +55,7 @@ public class ArticleController {
         return R.success("成功获取顶部文章",articleService.convertToListVO(articleService.listLatest(top)));
     }
 
+    @OperationLogMarker(operaType = OperationType.NEW, operaContent = "创建新文章")
     @PostMapping
     public R createArticle(@RequestBody ArticleParam articleParam){
         Article article = articleParam.convertTo();
@@ -83,6 +86,7 @@ public class ArticleController {
         return R.success("成功删除文章列表");
     }
 
+    @OperationLogMarker(operaType = OperationType.UPDATE, operaContent = "更新文章")
     @PutMapping("{id:\\d+}")
     public R updateArticle(@PathVariable("id")Long id,
                            @RequestBody ArticleParam articleParam){

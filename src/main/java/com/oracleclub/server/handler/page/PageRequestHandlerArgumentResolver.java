@@ -31,7 +31,7 @@ public class PageRequestHandlerArgumentResolver implements PageRequestArgumentRe
                                   WebDataBinderFactory webDataBinderFactory) throws Exception {
         String page = nativeWebRequest.getParameter("page");
         String size = nativeWebRequest.getParameter("size");
-        //todo 保留对Sort参数的处理
+
         return this.getPage(methodParameter,page,size);
     }
 

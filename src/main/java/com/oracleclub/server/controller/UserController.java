@@ -3,6 +3,7 @@ package com.oracleclub.server.controller;
 import com.oracleclub.server.annotation.PassToken;
 import com.oracleclub.server.entity.param.LoginParam;
 import com.oracleclub.server.entity.param.RegisterParam;
+import com.oracleclub.server.entity.param.VerifyCodeLoginParam;
 import com.oracleclub.server.entity.vo.AuthUserVO;
 import com.oracleclub.server.entity.vo.R;
 import com.oracleclub.server.service.UserService;
@@ -44,7 +45,9 @@ public class UserController {
 
     @PostMapping("login/verify")
     @PassToken
-    public R loginVerify(String email, String verifyCode) {
+    public R loginVerify(@RequestBody @Valid VerifyCodeLoginParam param) {
+        String email = param.getEmail();
+        String verifyCode = param.getVerifyCode();
         log.debug("邮箱:{},验证码:{}", email, verifyCode);
         Assert.notNull(email, "用户邮箱不能为空");
         Assert.notNull(verifyCode, "验证码不能为空");
@@ -66,6 +69,7 @@ public class UserController {
         Assert.notNull(password, "密码不能为空");
 
         AuthUserVO userDetail = userService.loginEmail(email, password);
+        System.out.println(userDetail);
         return R.success("登录成功",userDetail);
     }
 

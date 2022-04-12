@@ -1,6 +1,7 @@
 package com.oracleclub.server.controller.content;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.oracleclub.server.annotation.PassToken;
 import com.oracleclub.server.entity.Article;
 import com.oracleclub.server.entity.enums.ArticleStatus;
 import com.oracleclub.server.entity.param.ArticleQueryParam;
@@ -23,6 +24,7 @@ import java.util.List;
  * @date :2021/6/18 20:28
  */
 @Slf4j
+@PassToken
 @RestController("content_article_controller")
 @RequestMapping("api/content/articles")
 public class ArticleController {

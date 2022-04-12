@@ -158,4 +158,16 @@
         <include refid="base_table"/>
         WHERE deleted_at IS NULL
     </select>
+
+    <insert id="insertUser" parameterType="User" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO users
+        ( nickname, name, stu_num, email, password, ph_num, status, login_at )
+        VALUES (#{u.nickname}, #{u.name}, #{u.stuNum}, #{u.email}, #{u.password}, #{u.phNum}, #{u.status}, #{u.loginAt})
+    </insert>
+
+    <insert id="insertUserRole" parameterType="User">
+        INSERT INTO user_role
+        ( user_id, role_id )
+        VALUES (#{id}, #{role})
+    </insert>
 </mapper>

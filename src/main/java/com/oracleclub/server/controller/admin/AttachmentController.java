@@ -1,6 +1,8 @@
 package com.oracleclub.server.controller.admin;
 
+import com.oracleclub.server.annotation.OperationLogMarker;
 import com.oracleclub.server.entity.Attachment;
+import com.oracleclub.server.entity.enums.OperationType;
 import com.oracleclub.server.entity.param.AttachmentParam;
 import com.oracleclub.server.entity.param.PageRequest;
 import com.oracleclub.server.entity.vo.R;
@@ -52,6 +54,7 @@ public class AttachmentController {
         return R.success("成功删除附件",attachmentService.convertToVO(attachment));
     }
 
+    @OperationLogMarker(operaType = OperationType.DELETE, operaContent = "删除附件")
     @DeleteMapping
     public R deleteAttachmentByIds(@RequestBody List<Long> ids,
                                    @RequestParam(name = "soft",required = false,defaultValue = "true") boolean soft){
@@ -79,6 +82,7 @@ public class AttachmentController {
         return R.success("成功修改附件名",attachmentService.convertToVO(update));
     }
 
+    @OperationLogMarker(operaType = OperationType.UPDATE, operaContent = "恢复附件")
     @PutMapping
     public R rollbackAttachment(@RequestBody List<Long> ids){
         log.debug("ids:{}",ids);
@@ -93,6 +97,7 @@ public class AttachmentController {
     }
 
     @PostMapping("uploads")
+    @CrossOrigin
     public R uploads(@RequestParam("files")MultipartFile[] files){
         List<Attachment> list = new LinkedList<>();
         for (MultipartFile file : files) {

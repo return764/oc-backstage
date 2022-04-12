@@ -33,7 +33,6 @@ mybatis-plus:
   mapperLocations: classpath:mapper/*.xml
   configuration:
     map-underscore-to-camel-case: true
-    default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
   global-config:
     banner: false
   type-enums-package: com.oracleclub.server.entity.enums

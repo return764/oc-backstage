@@ -1,5 +1,6 @@
 package com.oracleclub.server.controller.content;
 
+import com.oracleclub.server.annotation.PassToken;
 import com.oracleclub.server.entity.Department;
 import com.oracleclub.server.entity.vo.DepartmentVO;
 import com.oracleclub.server.service.DepartmentService;
@@ -23,6 +24,7 @@ public class DepartmentController {
     @Resource
     private DepartmentService departmentService;
 
+    @PassToken
     @GetMapping
     public List<DepartmentVO> list(){
         List<Department> departments = departmentService.listAllExist();

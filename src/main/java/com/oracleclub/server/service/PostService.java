@@ -21,5 +21,7 @@ public interface PostService extends CrudService<Post, Long> {
 
     void createByParams(PostParams postParams);
 
-    IPage<SimplePostVO> pageOwnPost(Long userId, IPage<Post> pageRequest);
+    IPage<SimplePostVO> pageByUserId(Long userId, IPage<Post> pageRequest);
+
+    void deleteById(Long id);
 }

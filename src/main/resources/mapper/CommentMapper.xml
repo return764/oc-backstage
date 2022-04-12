@@ -15,4 +15,14 @@
         where root_id = #{commentId}
         order by created_at desc
     </select>
+
+    <select id="pageReplyMeReplyByIssuerId" resultType="Comment" parameterType="Long">
+        select
+        r.*
+        from bbs_comments l
+        left join bbs_comments r
+        on l.id = r.parent_id
+        where l.issuer_id = #{issuerId} and r.issuer_id != #{issuerId} and r.deleted_at is null
+        order by created_at asc
+    </select>
 </mapper>

@@ -4,6 +4,7 @@ package com.oracleclub.server.dao;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.oracleclub.server.dao.base.BaseDao;
 import com.oracleclub.server.entity.User;
+import com.oracleclub.server.entity.enums.Role;
 import com.oracleclub.server.entity.param.UserQueryParam;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -30,4 +31,8 @@ public interface UserMapper extends BaseDao<User,Long> {
     int updateLoginTimeBy(@Param("u") User user);
 
     int getUserCount();
+
+    int insertUser(@Param("u")User user);
+
+    int insertUserRole(@Param("id") Long id, @Param("role") Role role);
 }

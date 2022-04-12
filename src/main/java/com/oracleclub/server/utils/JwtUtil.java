@@ -1,5 +1,6 @@
 package com.oracleclub.server.utils;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
@@ -78,9 +79,17 @@ public class JwtUtil {
         return new LoginToken(token,refreshToken);
     }
 
-    public static Long getUserId(String token) {
-        String tokenLast = ReUtil.get(BEARER_RE, token, 1);
-        Map<String, Claim> verifyToken = JwtUtil.verify(tokenLast);
-        return verifyToken.get("userId").asLong();
+
+    public static String getUserId(String authToken) {
+        String token = getRealToken(authToken);
+        Assert.notBlank(token, "token不能为空");
+
+        Map<String, Claim> claimMap = verify(token);
+        return claimMap.get("userId").asString();
+    }
+
+    public static String getRealToken(String sourceToken) {
+        Assert.notNull(sourceToken, "解析的token不能为空");
+        return ReUtil.get(BEARER_RE, sourceToken, 1);
     }
 }

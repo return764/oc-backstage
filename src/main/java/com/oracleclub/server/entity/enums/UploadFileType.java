@@ -1,5 +1,7 @@
 package com.oracleclub.server.entity.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+
 /**
  * @author :RETURN
  * @date :2021/2/27 21:22
@@ -14,6 +16,7 @@ public enum UploadFileType implements ValueEnum<Integer> {
      */
     OSS(1);
 
+    @EnumValue
     private final Integer value;
 
     UploadFileType(Integer value) {

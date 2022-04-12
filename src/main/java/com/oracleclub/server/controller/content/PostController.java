@@ -1,6 +1,7 @@
 package com.oracleclub.server.controller.content;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.oracleclub.server.annotation.PassToken;
 import com.oracleclub.server.entity.param.PageRequest;
 import com.oracleclub.server.entity.param.PostParams;
 import com.oracleclub.server.entity.vo.PostVO;
@@ -8,7 +9,6 @@ import com.oracleclub.server.entity.vo.R;
 import com.oracleclub.server.entity.vo.SimplePostVO;
 import com.oracleclub.server.handler.page.PageDefault;
 import com.oracleclub.server.service.PostService;
-import com.oracleclub.server.utils.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
@@ -22,6 +22,7 @@ import javax.annotation.Resource;
  * @date :2021/10/10 23:09
  */
 @Slf4j
+@PassToken
 @RestController("content_post_controller")
 @RequestMapping("api/content/posts")
 public class PostController {
@@ -43,13 +44,6 @@ public class PostController {
         return postService.getHolePost(id);
     }
 
-    @GetMapping("ownTopic")
-    public IPage<SimplePostVO> getOwnTopic(@PageDefault PageRequest pageable,@RequestHeader("Authorization")String token) {
-        Long userId = JwtUtil.getUserId(token);
-
-        return postService.pageOwnPost(userId, pageable.convertTo());
-    }
-
     @PostMapping(value = "upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String imageUpload(@RequestParam("image") MultipartFile image){
         Assert.notNull(image,"上传文件不能为空");
@@ -63,5 +57,13 @@ public class PostController {
 
         postService.createByParams(postParams);
         return R.success("成功");
+    }
+
+    @PostMapping("delete")
+    public R delete(Long id) {
+        Assert.notNull(id,"id不能为空");
+
+        postService.deleteById(id);
+        return R.success("ok");
     }
 }

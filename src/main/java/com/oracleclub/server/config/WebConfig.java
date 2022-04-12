@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.optimize.JsqlParserCountOptimize;
 import com.oracleclub.server.config.properties.AppProperties;
 import com.oracleclub.server.dao.inject.MySqlInject;
+import com.oracleclub.server.handler.argResolver.LoginSignArgumentResolver;
 import com.oracleclub.server.handler.page.PageRequestHandlerArgumentResolver;
 import com.oracleclub.server.interceptor.TokenInterceptor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 public class WebConfig implements WebMvcConfigurer {
 
     private static final String FILE_PROTOCOL = "file:///";
+    public static final String TOKEN_NAME = "Authorization";
     @Resource
     TokenInterceptor tokenInterceptor;
     @Resource
@@ -43,7 +45,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/upload/**")
                 .excludePathPatterns("/post/**")
                 .excludePathPatterns("/pictures/**")
-                .excludePathPatterns("/api/content/**");
+                .excludePathPatterns("/**/error");
     }
 
     @Override
@@ -57,6 +59,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new PageRequestHandlerArgumentResolver());
+        resolvers.add(new LoginSignArgumentResolver());
     }
 
     @Override

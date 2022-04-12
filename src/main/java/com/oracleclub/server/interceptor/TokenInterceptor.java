@@ -1,14 +1,15 @@
 package com.oracleclub.server.interceptor;
 
-import cn.hutool.core.util.ReUtil;
-import com.auth0.jwt.interfaces.Claim;
+import cn.hutool.core.annotation.AnnotationUtil;
 import com.oracleclub.server.annotation.PassToken;
+import com.oracleclub.server.config.WebConfig;
 import com.oracleclub.server.exception.AuthenticationException;
 import com.oracleclub.server.exception.TokenPastDateException;
+import com.oracleclub.server.service.UserService;
 import com.oracleclub.server.utils.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.ehcache.Cache;
-import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -16,9 +17,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
-
-import static com.oracleclub.server.utils.JwtUtil.BEARER_RE;
 
 /**
  * token拦截器，拦截所有请求
@@ -30,10 +28,12 @@ import static com.oracleclub.server.utils.JwtUtil.BEARER_RE;
 @Slf4j
 public class TokenInterceptor implements HandlerInterceptor {
 
-    private static final String TOKEN_NAME = "Authorization";
-
     @Resource(name = "tokenCache")
     private Cache<String, String> tokenCache;
+
+    @Lazy
+    @Resource
+    private UserService userService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -42,36 +42,32 @@ public class TokenInterceptor implements HandlerInterceptor {
             return true;
         }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
-
-        if(handlerMethod.getBeanType() == BasicErrorController.class){
-            throw new RuntimeException("未知错误");
+        Class<?> declaringClass = handlerMethod.getMethod().getDeclaringClass();
+        if (AnnotationUtil.hasAnnotation(declaringClass, PassToken.class)) {
+            return true;
         }
         //如果有不需要验证token的注解
         if (handlerMethod.hasMethodAnnotation(PassToken.class)){
             return true;
         }
 
-        String token = request.getHeader(TOKEN_NAME);
-        if (null == token){
-            throw new AuthenticationException("无token,请重新登录");
-        }
 
-        token = ReUtil.get(BEARER_RE, token, 1);
-        if (null == token){
+        String sourceToken = request.getHeader(WebConfig.TOKEN_NAME);
+        String realToken = JwtUtil.getRealToken(sourceToken);
+        if (null == realToken){
             throw new AuthenticationException("token格式错误，请重新登录");
         }
 
-        //验证token
-        Map<String, Claim> verify = JwtUtil.verify(token);
-        String userId = verify.get("userId").asString();
+        String userId = JwtUtil.getUserId(sourceToken);
         String cacheToken = tokenCache.get(userId);
         request.setAttribute("userId",userId);
+        request.setAttribute("user", userService.getUserAndDepartment(Long.valueOf(userId)));
 
         log.debug("cacheToken:{}",cacheToken);
-        log.debug("token:{}",token);
+        log.debug("token:{}",realToken);
 
         //缓存中存在，并且与传递过来的token不相同
-        if (null != cacheToken &&!token.equals(cacheToken)){
+        if (null != cacheToken &&!realToken.equals(cacheToken)){
             throw new AuthenticationException("token不匹配");
         }
 

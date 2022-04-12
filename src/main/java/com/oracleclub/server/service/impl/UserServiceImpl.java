@@ -15,7 +15,6 @@ import com.oracleclub.server.entity.vo.AuthUserVO;
 import com.oracleclub.server.entity.vo.DepartmentVO;
 import com.oracleclub.server.entity.vo.SimpleUserVO;
 import com.oracleclub.server.entity.vo.UserVO;
-import com.oracleclub.server.event.LogEvent;
 import com.oracleclub.server.exception.LoginException;
 import com.oracleclub.server.exception.UserException;
 import com.oracleclub.server.exception.VerifyCodeException;
@@ -112,21 +111,18 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         } catch (MessagingException e) {
             throw new VerifyCodeException("验证码发送失败");
         }
-
     }
 
     @Override
     public AuthUserVO loginVerify(String email, String verifyCode) {
         log.debug("邮箱验证码登录开始");
         String matchVerifyCode = verifyCodeCache.get(email);
+        log.debug("带匹配的验证码：{}", matchVerifyCode);
         if (verifyCode.equals(matchVerifyCode)) {
             User u = userMapper.findByEmail(email);
             log.debug("当前登录用户:[{}]",u);
             u.setLoginAt(LocalDateTime.now());
             userMapper.updateById(u);
-
-            LogEvent log = new LogEvent(this,"登录","验证码登录");
-            eventPublisher.publishEvent(log);
 
             return getAuthUser(u);
         }
@@ -144,9 +140,6 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
             u.setLoginAt(LocalDateTime.now());
             userMapper.updateLoginTimeBy(u);
 
-            LogEvent log = new LogEvent(this,"登录","邮箱登录");
-            eventPublisher.publishEvent(log);
-
             return getAuthUser(u);
         }
         throw new LoginException("账号或密码错误");
@@ -159,9 +152,6 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         if(checkPassword(u,password)){
             u.setLoginAt(LocalDateTime.now());
             userMapper.updateById(u);
-
-            LogEvent log = new LogEvent(this,"登录","学号登录");
-            eventPublisher.publishEvent(log);
 
             return getAuthUser(u);
         }
@@ -206,11 +196,9 @@ public class UserServiceImpl extends AbstractCrudService<User,Long> implements U
         }
         //加密密码
         user.setPassword(DigestUtil.md5Hex(user.getPassword()));
-        userMapper.insert(user);
+        userMapper.insertUser(user);
+        userMapper.insertUserRole(user.getId(), user.getRole());
         User u = userMapper.findUserById(user.getId());
-
-        LogEvent log = new LogEvent(this,"注册","注册用户");
-        eventPublisher.publishEvent(log);
 
         return getAuthUser(u);
     }
