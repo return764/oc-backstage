@@ -80,6 +80,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
     public List<Comment> getAllByPostId(Long postId) {
         QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("post_id", postId);
+        queryWrapper.isNull("deleted_at");
         queryWrapper.orderByAsc("created_at");
         return commentMapper.selectList(queryWrapper);
     }
@@ -139,6 +140,18 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         commentsByPost = commentsByPost.stream().peek(comment -> comment.setDeletedAt(LocalDateTime.now())).collect(Collectors.toList());
 
         updateInBatch(commentsByPost);
+    }
+
+    @Override
+    public void deleteById(Long commentId) {
+        Comment comment = getByIdExist(commentId);
+        comment.setDeletedAt(LocalDateTime.now());
+        this.update(comment);
+        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("parent_id", commentId);
+        Optional.ofNullable(commentMapper.selectList(queryWrapper)).ifPresent(comments -> {
+            comments.forEach(c -> this.deleteById(c.getId()));
+        });
     }
 
     @Override

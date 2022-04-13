@@ -28,4 +28,6 @@ public interface CommentService extends CrudService<Comment, Long>, ConverterSer
     IPage<ReplyMeReplyVO> pageReplyMeReplyByUserId(IPage<Comment> convertTo, Long id);
 
     void deleteByPostId(Long postId);
+
+    void deleteById(Long commentId);
 }

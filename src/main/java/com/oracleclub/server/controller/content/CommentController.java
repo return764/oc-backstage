@@ -58,4 +58,12 @@ public class CommentController {
 
         return commentService.pageReply(pageable.convertTo(), commentId);
     }
+
+    @PostMapping("delete")
+    public R delete(Long id) {
+        Assert.notNull(id, "commentId不能为空");
+
+        commentService.deleteById(id);
+        return R.success("ok");
+    }
 }
